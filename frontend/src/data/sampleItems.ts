@@ -1,7 +1,7 @@
 import { GameItem } from "@/types/game";
 
 export const sampleItems: GameItem[] = [
-  { id: "1", name: "3 anos sem a comida preferida", imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=200&fit=crop" },
+  { id: "1", name: "3 anos sem a comida preferida", imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=200&fit=dot" },
   { id: "2", name: "6 meses sem higiene pessoal", imageUrl: "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=200&h=200&fit=crop" },
   { id: "3", name: "3 anos sem sexo", imageUrl: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=200&h=200&fit=crop" },
   { id: "4", name: "Escalar o Everest", imageUrl: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=200&h=200&fit=crop" },

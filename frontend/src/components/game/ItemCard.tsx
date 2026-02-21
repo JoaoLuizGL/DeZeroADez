@@ -9,7 +9,7 @@ interface ItemCardProps {
 }
 
 const ItemCard = ({ item, isSelected, onClick, size = "md" }: ItemCardProps) => {
-  const sizeClasses = (size === "sm" ? "size-24" : "size-32") + "h-fit w-fit";
+  const sizeClasses = (size === "sm" ? "size-24" : "size-40") + " w-fit";
 
   return (
     <button
