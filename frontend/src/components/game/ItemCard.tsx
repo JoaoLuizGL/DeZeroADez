@@ -9,17 +9,17 @@ interface ItemCardProps {
 }
 
 const ItemCard = ({ item, isSelected, onClick, size = "md" }: ItemCardProps) => {
-  const sizeClasses = size === "sm" ? "w-20 h-20" : "w-24 h-24";
+  const sizeClasses = (size === "sm" ? "size-24" : "size-32") + "h-fit w-fit";
 
   return (
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center gap-1 rounded-md transition-all duration-200 cursor-pointer group",
+        "flex flex-col items-center gap-1 rounded-md transition-all duration-200 cursor-pointer group ring-1 ring-gold-dim",
         sizeClasses,
         isSelected
           ? "ring-2 ring-accent scale-105 shadow-[0_0_15px_hsl(var(--selected-glow)/0.4)]"
-          : "hover:ring-1 hover:ring-gold-dim hover:scale-105"
+          : "hover:scale-105"
       )}
     >
       <div className={cn(
@@ -32,7 +32,7 @@ const ItemCard = ({ item, isSelected, onClick, size = "md" }: ItemCardProps) => 
           className="w-full h-full object-cover"
         />
       </div>
-      <span className="text-[10px] font-medium text-foreground leading-tight text-center line-clamp-2 w-full px-0.5">
+      <span className="text-lg font-bold text-foreground leading-tight text-center line-clamp-2 w-full px-0.5">
         {item.name}
       </span>
     </button>
