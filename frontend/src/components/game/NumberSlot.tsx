@@ -24,7 +24,7 @@ const NumberSlot = ({
   const canPlace = hasSelectedItem && availableSlots > 0;
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-1 group">
       {/* Number header */}
       <button
         onClick={() => canPlace && onPlaceItem(rating)}
@@ -34,7 +34,7 @@ const NumberSlot = ({
           isSpecial
             ? "bg-primary text-primary-foreground border-primary"
             : "bg-secondary text-foreground border-border",
-          canPlace && "cursor-pointer hover:bg-accent hover:text-accent-foreground hover:shadow-[0_0_20px_hsl(var(--selected-glow)/0.3)]",
+          canPlace && "cursor-pointer group-hover:bg-accent group-hover:text-accent-foreground group-hover:shadow-[0_0_20px_hsl(var(--selected-glow)/0.3)]",
           !canPlace && "cursor-default"
         )}
       >
@@ -55,16 +55,16 @@ const NumberSlot = ({
               className={cn(
                 "relative w-full aspect-square rounded-sm border transition-all duration-200 overflow-hidden",
                 placed
-                  ? "border-border bg-secondary cursor-pointer hover:border-destructive group"
+                  ? "border-border bg-secondary cursor-pointer hover:border-destructive"
                   : canPlace
-                    ? "border-dashed border-gold-dim bg-slot-bg cursor-pointer hover:border-accent hover:bg-accent/10 hover:shadow-[0_0_12px_hsl(var(--selected-glow)/0.15)]"
+                    ? "border-dashed border-gold-dim bg-slot-bg cursor-pointer group-hover:border-accent group-hover:bg-accent/10 group-hover:shadow-[0_0_12px_hsl(var(--selected-glow)/0.15)]"
                     : "border-border/30 bg-slot-bg"
               )}
             >
               {placed ? (
                 <>
                   <img src={placed.imageUrl} alt={placed.name} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-background/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="absolute inset-0 bg-background/70 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
                     <X className="w-5 h-5 text-destructive" />
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 bg-background/80 px-0.5 py-0.5">
