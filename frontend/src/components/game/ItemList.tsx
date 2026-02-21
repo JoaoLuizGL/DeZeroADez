@@ -9,15 +9,15 @@ interface ItemListProps {
 
 const ItemList = ({ items, selectedItemId, onSelectItem }: ItemListProps) => {
   return (
-    <div className="flex flex-col h-full bg-card border-r-2 border-border">
+    <div className="flex flex-col h-full w-[12.5vw] bg-card border-r-2 border-border">
       <div className="p-3 border-b border-border">
         <h2 className="font-display text-2xl text-primary tracking-wide">ITENS</h2>
         <p className="text-xs text-muted-foreground">
           {items.length} {items.length === 1 ? "item" : "itens"} disponíveis
         </p>
       </div>
-      <div className="flex-1 overflow-y-auto p-3">
-        <div className="grid grid-cols-2 gap-3">
+      <div className="flex-1 overflow-y-auto no-scrollbar p-3">
+        <div className="grid grid-cols-1 gap-3">
           {items.map((item) => (
             <ItemCard
               key={item.id}
