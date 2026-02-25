@@ -67,8 +67,10 @@ const NumberSlot = ({
                   <div className="absolute inset-0 bg-background/70 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
                     <X className="w-5 h-5 text-destructive" />
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-background/80 px-0.5 py-0.5">
-                    <span className="text-[8px] text-foreground line-clamp-1">{placed.name}</span>
+                  <div className="absolute bottom-0 left-0 right-0 bg-background/80 px-1 py-1 min-h-[2.5vw] flex items-center">
+                    <span className="text-xs text-foreground w-full text-center leading-tight">
+                      {placed.name}
+                    </span>
                   </div>
                 </>
               ) : (
