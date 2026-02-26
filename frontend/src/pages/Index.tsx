@@ -5,7 +5,7 @@ import ItemList from "@/components/game/ItemList";
 import RatingBoard from "@/components/game/RatingBoard";
 
 const SLOT_LIMITS: Record<number, number> = {
-  0: 1, 1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3, 7: 3, 8: 3, 9: 3, 10: 1,
+  0: 3, 1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3, 7: 3, 8: 3, 9: 3, 10: 3,
 };
 
 const Index = () => {
@@ -18,16 +18,34 @@ const Index = () => {
   }, []);
 
   const handlePlaceItem = useCallback(
-    (rating: number) => {
+    (rating: number, slotIndex: number) => {
       if (!selectedItemId) return;
+
       const item = availableItems.find((i) => i.id === selectedItemId);
       if (!item) return;
 
-      const currentCount = placedItems.filter((i) => i.rating === rating).length;
-      if (currentCount >= SLOT_LIMITS[rating]) return;
+      const slotLimit = SLOT_LIMITS[rating];
 
-      setPlacedItems((prev) => [...prev, { ...item, rating, slotIndex: currentCount }]);
-      setAvailableItems((prev) => prev.filter((i) => i.id !== selectedItemId));
+      // Prevent exceeding slot limit
+      const ratingItems = placedItems.filter((i) => i.rating === rating);
+      if (ratingItems.length >= slotLimit) return;
+
+      // Prevent overwriting an occupied slot
+      const slotOccupied = placedItems.some(
+        (i) => i.rating === rating && i.slotIndex === slotIndex
+      );
+      if (slotOccupied) return;
+
+
+      setPlacedItems((prev) => [
+        ...prev,
+        { ...item, rating, slotIndex }, // ✅ same format preserved
+      ]);
+
+      setAvailableItems((prev) =>
+        prev.filter((i) => i.id !== selectedItemId)
+      );
+
       setSelectedItemId(null);
     },
     [selectedItemId, availableItems, placedItems]
