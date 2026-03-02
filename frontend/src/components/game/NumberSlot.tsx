@@ -7,6 +7,7 @@ interface NumberSlotProps {
   slots: number;
   placedItems: PlacedItem[];
   hasSelectedItem: boolean;
+  availableItemsCount: number; // ✅ Nova prop
   onPlaceItem: (rating: number, slotIndex: number) => void;
   onRemoveItem: (itemId: string) => void;
 }
@@ -16,6 +17,7 @@ const NumberSlot = ({
   slots,
   placedItems,
   hasSelectedItem,
+  availableItemsCount,
   onPlaceItem,
   onRemoveItem,
 }: NumberSlotProps) => {
@@ -24,7 +26,12 @@ const NumberSlot = ({
   const renderSlot = (idx: number) => {
     const placed = placedItems[idx] ?? null;
     const isEmpty = !placed;
-    const canReceive = hasSelectedItem && isEmpty;
+    
+    // ✅ Regra: Slots 0 e 10 (index 0) só aceitam se for o último item da lista
+    const isSpecialSlot0 = isSpecial && idx === 0;
+    const isLockedByRule = isSpecialSlot0 && availableItemsCount > 1;
+    
+    const canReceive = hasSelectedItem && isEmpty && !isLockedByRule;
     const isSecondaryArea = isSpecial && idx > 0;
 
     return (
@@ -58,6 +65,7 @@ const NumberSlot = ({
                 )
               : cn(
                   "border-border/30",
+                  isLockedByRule && "opacity-40 cursor-not-allowed grayscale-[0.5]",
                   isSecondaryArea
                     ? "bg-primary/5"
                     : "bg-slot-bg"
@@ -84,12 +92,15 @@ const NumberSlot = ({
             </>
           ) : (
             <>
-              {isSpecial && idx === 0 && (
-                <div className="w-full h-full flex items-center justify-center">
+              {isSpecialSlot0 && (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-1">
                   {rating === 0 ? (
-                    <X className="w-6 h-6 text-destructive" />
+                    <X className={cn("w-6 h-6", isLockedByRule ? "text-muted-foreground" : "text-destructive")} />
                   ) : (
-                    <Star className="w-6 h-6 text-primary" />
+                    <Star className={cn("w-6 h-6", isLockedByRule ? "text-muted-foreground" : "text-primary")} />
+                  )}
+                  {isLockedByRule && (
+                    <span className="text-[8px] uppercase font-bold text-muted-foreground">Bloqueado</span>
                   )}
                 </div>
               )}

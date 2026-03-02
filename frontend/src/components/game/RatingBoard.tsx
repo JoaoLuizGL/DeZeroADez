@@ -4,7 +4,8 @@ import NumberSlot from "./NumberSlot";
 interface RatingBoardProps {
   placedItems: PlacedItem[];
   hasSelectedItem: boolean;
-  onPlaceItem: (rating: number, slotIndex: number) => void; // ✅ updated
+  availableItemsCount: number; // ✅ Nova prop
+  onPlaceItem: (rating: number, slotIndex: number) => void;
   onRemoveItem: (itemId: string) => void;
 }
 
@@ -25,6 +26,7 @@ const RATING_CONFIG: { rating: number; slots: number }[] = [
 const RatingBoard = ({
   placedItems,
   hasSelectedItem,
+  availableItemsCount,
   onPlaceItem,
   onRemoveItem,
 }: RatingBoardProps) => {
@@ -60,8 +62,9 @@ const RatingBoard = ({
                 key={rating}
                 rating={rating}
                 slots={slots}
-                placedItems={ratingItems} // ✅ now positional
+                placedItems={ratingItems}
                 hasSelectedItem={hasSelectedItem}
+                availableItemsCount={availableItemsCount} // ✅ Passando para o slot
                 onPlaceItem={onPlaceItem}
                 onRemoveItem={onRemoveItem}
               />

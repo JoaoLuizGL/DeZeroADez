@@ -24,6 +24,12 @@ const Index = () => {
       const item = availableItems.find((i) => i.id === selectedItemId);
       if (!item) return;
 
+      // ✅ Regra: Slots 0 e 10 (index 0) só aceitam o último item
+      const isSpecialSlot0 = (rating === 0 || rating === 10) && slotIndex === 0;
+      if (isSpecialSlot0 && availableItems.length > 1) {
+        return;
+      }
+
       const slotLimit = SLOT_LIMITS[rating];
 
       // Prevent exceeding slot limit
@@ -76,6 +82,7 @@ const Index = () => {
       <RatingBoard
         placedItems={placedItems}
         hasSelectedItem={selectedItemId !== null}
+        availableItemsCount={availableItems.length} // ✅ Passando a contagem
         onPlaceItem={handlePlaceItem}
         onRemoveItem={handleRemoveItem}
       />
