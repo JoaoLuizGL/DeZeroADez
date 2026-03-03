@@ -6,29 +6,36 @@ interface NumberSlotProps {
   rating: number;
   slots: number;
   placedItems: PlacedItem[];
-  hasSelectedItem: boolean;
-  availableItemsCount: number; // ✅ Nova prop
+  selectedItemId: string | null;
+  availableItemsCount: number;
   onPlaceItem: (rating: number, slotIndex: number) => void;
   onRemoveItem: (itemId: string) => void;
+  onSelectItem: (id: string) => void;
 }
 
 const NumberSlot = ({
   rating,
   slots,
   placedItems,
-  hasSelectedItem,
+  selectedItemId,
   availableItemsCount,
   onPlaceItem,
   onRemoveItem,
+  onSelectItem,
 }: NumberSlotProps) => {
   const isSpecial = rating === 0 || rating === 10;
+  const hasSelectedItem = selectedItemId !== null;
 
   const renderSlot = (idx: number) => {
     const placed = placedItems[idx] ?? null;
+    const isSelected = placed && selectedItemId === placed.id;
     const isEmpty = !placed;
     
     // ✅ Regra: Slots 0 e 10 (index 0) só aceitam se for o último item da lista
     const isSpecialSlot0 = isSpecial && idx === 0;
+    
+    // Se estivermos movendo um item já colocado, ele "conta" como disponível.
+    // Mas a lógica de Index.tsx já cuida disso. Aqui apenas visualmente mostramos bloqueado.
     const isLockedByRule = isSpecialSlot0 && availableItemsCount > 1;
     
     const canReceive = hasSelectedItem && isEmpty && !isLockedByRule;
@@ -43,16 +50,25 @@ const NumberSlot = ({
         <div
           onClick={() => {
             if (placed) {
-              onRemoveItem(placed.id);
+              if (isSelected) {
+                onRemoveItem(placed.id);
+              } else {
+                onSelectItem(placed.id);
+              }
             } else if (canReceive) {
               onPlaceItem(rating, idx);
             }
           }}
           className={cn(
-            "relative w-full aspect-square rounded-sm border transition-all duration-200 overflow-hidden group/slot",
+            "relative w-full aspect-square rounded-sm border transition-all duration-300 overflow-hidden group/slot",
 
             placed
-              ? "border-border bg-secondary cursor-pointer hover:border-destructive"
+              ? cn(
+                  "bg-secondary cursor-pointer",
+                  isSelected
+                    ? "border-accent ring-2 ring-accent scale-105 z-20 shadow-[0_0_20px_hsl(var(--selected-glow)/0.5)]"
+                    : "border-border hover:scale-110 hover:border-accent hover:shadow-[0_0_15px_hsl(var(--selected-glow)/0.4)] hover:z-30"
+                )
               : canReceive
               ? cn(
                   "border-dashed cursor-pointer",
@@ -77,18 +93,29 @@ const NumberSlot = ({
               <img
                 src={placed.imageUrl}
                 alt={placed.name}
-                className="w-full h-full object-cover transition-opacity duration-200 group-hover/slot:opacity-40"
+                className={cn(
+                  "w-full h-full object-cover transition-all duration-300",
+                  isSelected && "group-hover/slot:scale-95"
+                )}
               />
 
-              <div className="absolute inset-0 bg-background/70 opacity-0 group-hover/slot:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none">
-                <X className="w-5 h-5 text-destructive" />
-              </div>
-
-              <div className="absolute bottom-0 left-0 right-0 bg-background/80 px-1 py-1 min-h-[2.5vw] flex items-center">
-                <span className="text-xs text-foreground w-full text-center leading-tight">
+              <div className={cn(
+                "absolute bottom-0 left-0 right-0 px-1 py-1 min-h-[2.5vw] flex items-center transition-colors duration-200",
+                isSelected ? "bg-accent/90" : "bg-background/90"
+              )}>
+                <span className={cn(
+                  "text-[10px] sm:text-xs w-full text-center leading-tight font-medium transition-colors duration-200",
+                  isSelected ? "text-accent-foreground" : "text-foreground group-hover/slot:text-accent"
+                )}>
                   {placed.name}
                 </span>
               </div>
+
+              {isSelected && (
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/slot:opacity-100 transition-opacity duration-200 flex items-center justify-center z-10">
+                  <X className="w-10 h-10 text-white drop-shadow-md" />
+                </div>
+              )}
             </>
           ) : (
             <>

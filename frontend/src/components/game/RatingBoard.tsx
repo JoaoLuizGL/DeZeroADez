@@ -3,10 +3,11 @@ import NumberSlot from "./NumberSlot";
 
 interface RatingBoardProps {
   placedItems: PlacedItem[];
-  hasSelectedItem: boolean;
-  availableItemsCount: number; // ✅ Nova prop
+  selectedItemId: string | null;
+  availableItemsCount: number;
   onPlaceItem: (rating: number, slotIndex: number) => void;
   onRemoveItem: (itemId: string) => void;
+  onSelectItem: (id: string) => void;
 }
 
 const RATING_CONFIG: { rating: number; slots: number }[] = [
@@ -25,11 +26,13 @@ const RATING_CONFIG: { rating: number; slots: number }[] = [
 
 const RatingBoard = ({
   placedItems,
-  hasSelectedItem,
+  selectedItemId,
   availableItemsCount,
   onPlaceItem,
   onRemoveItem,
+  onSelectItem,
 }: RatingBoardProps) => {
+  const hasSelectedItem = selectedItemId !== null;
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       <div className="p-3 border-b border-border flex items-center justify-between">
@@ -63,10 +66,11 @@ const RatingBoard = ({
                 rating={rating}
                 slots={slots}
                 placedItems={ratingItems}
-                hasSelectedItem={hasSelectedItem}
-                availableItemsCount={availableItemsCount} // ✅ Passando para o slot
+                selectedItemId={selectedItemId}
+                availableItemsCount={availableItemsCount}
                 onPlaceItem={onPlaceItem}
                 onRemoveItem={onRemoveItem}
+                onSelectItem={onSelectItem}
               />
             );
           })}

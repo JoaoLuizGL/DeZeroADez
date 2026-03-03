@@ -21,20 +21,27 @@ const Index = () => {
     (rating: number, slotIndex: number) => {
       if (!selectedItemId) return;
 
-      const item = availableItems.find((i) => i.id === selectedItemId);
-      if (!item) return;
+      const availableItem = availableItems.find((i) => i.id === selectedItemId);
+      const placedItem = placedItems.find((i) => i.id === selectedItemId);
+      
+      if (!availableItem && !placedItem) return;
 
-      // ✅ Regra: Slots 0 e 10 (index 0) só aceitam o último item
+      const itemToPlace = availableItem || placedItem!;
+
+      // ✅ Regra: Slots 0 e 10 (index 0) só aceitam se for o ÚLTIMO item TOTAL a ser colocado
       const isSpecialSlot0 = (rating === 0 || rating === 10) && slotIndex === 0;
-      if (isSpecialSlot0 && availableItems.length > 1) {
-        return;
+      if (isSpecialSlot0) {
+        if (availableItem && availableItems.length > 1) return;
+        if (placedItem && availableItems.length > 0) return;
       }
 
       const slotLimit = SLOT_LIMITS[rating];
 
       // Prevent exceeding slot limit
       const ratingItems = placedItems.filter((i) => i.rating === rating);
-      if (ratingItems.length >= slotLimit) return;
+      if (ratingItems.length >= slotLimit && (!placedItem || placedItem.rating !== rating)) {
+        return;
+      }
 
       // Prevent overwriting an occupied slot
       const slotOccupied = placedItems.some(
@@ -42,15 +49,21 @@ const Index = () => {
       );
       if (slotOccupied) return;
 
-
-      setPlacedItems((prev) => [
-        ...prev,
-        { ...item, rating, slotIndex }, // ✅ same format preserved
-      ]);
-
-      setAvailableItems((prev) =>
-        prev.filter((i) => i.id !== selectedItemId)
-      );
+      if (availableItem) {
+        setPlacedItems((prev) => [
+          ...prev,
+          { ...availableItem, rating, slotIndex },
+        ]);
+        setAvailableItems((prev) =>
+          prev.filter((i) => i.id !== selectedItemId)
+        );
+      } else {
+        setPlacedItems((prev) =>
+          prev.map((i) =>
+            i.id === selectedItemId ? { ...i, rating, slotIndex } : i
+          )
+        );
+      }
 
       setSelectedItemId(null);
     },
@@ -63,8 +76,13 @@ const Index = () => {
       if (!item) return;
       setPlacedItems((prev) => prev.filter((i) => i.id !== itemId));
       setAvailableItems((prev) => [...prev, { id: item.id, name: item.name, imageUrl: item.imageUrl }]);
+      
+      // If the item being removed was selected, deselect it
+      if (selectedItemId === itemId) {
+        setSelectedItemId(null);
+      }
     },
-    [placedItems]
+    [placedItems, selectedItemId]
   );
 
   return (
@@ -81,10 +99,11 @@ const Index = () => {
       {/* Main board */}
       <RatingBoard
         placedItems={placedItems}
-        hasSelectedItem={selectedItemId !== null}
-        availableItemsCount={availableItems.length} // ✅ Passando a contagem
+        selectedItemId={selectedItemId}
+        availableItemsCount={availableItems.length}
         onPlaceItem={handlePlaceItem}
         onRemoveItem={handleRemoveItem}
+        onSelectItem={handleSelectItem}
       />
     </div>
   );

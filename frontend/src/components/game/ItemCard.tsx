@@ -32,7 +32,12 @@ const ItemCard = ({ item, isSelected, onClick, size = "md" }: ItemCardProps) => 
           className="w-full h-full object-cover"
         />
       </div>
-      <span className="text-lg font-bold text-foreground leading-tight text-center line-clamp-2 w-full px-0.5">
+      <span className={cn(
+        "text-lg font-bold leading-tight text-center line-clamp-2 w-full px-1 py-0.5 rounded-sm transition-colors duration-200",
+        isSelected 
+          ? "bg-accent text-accent-foreground" 
+          : "text-foreground group-hover:text-accent"
+      )}>
         {item.name}
       </span>
     </button>
