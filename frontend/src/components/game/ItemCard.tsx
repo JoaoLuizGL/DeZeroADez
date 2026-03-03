@@ -15,7 +15,7 @@ const ItemCard = ({ item, isSelected, onClick, size = "md" }: ItemCardProps) => 
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center gap-1 rounded-md transition-all duration-200 cursor-pointer group ring-1 ring-gold-dim",
+        "flex flex-col items-center rounded-md transition-all duration-200 cursor-pointer group ring-1 ring-gold-dim",
         sizeClasses,
         isSelected
           ? "ring-2 ring-accent scale-105 shadow-[0_0_15px_hsl(var(--selected-glow)/0.4)]"
