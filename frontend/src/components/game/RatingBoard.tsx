@@ -2,6 +2,7 @@ import { PlacedItem } from "@/types/game";
 import NumberSlot from "./NumberSlot";
 
 interface RatingBoardProps {
+  gameName: string;
   placedItems: PlacedItem[];
   selectedItemId: string | null;
   availableItemsCount: number;
@@ -25,6 +26,7 @@ const RATING_CONFIG: { rating: number; slots: number }[] = [
 ];
 
 const RatingBoard = ({
+  gameName,
   placedItems,
   selectedItemId,
   availableItemsCount,
@@ -36,15 +38,25 @@ const RatingBoard = ({
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       <div className="p-3 border-b border-border flex items-center justify-between">
-        <h2 className="font-display text-2xl text-primary tracking-wide">
-          DE SOLA A DEZ
-        </h2>
+        <div className="flex-1">
+          <h2 className="font-display text-2xl text-primary tracking-wide whitespace-nowrap">
+            DE ZERO A DEZ
+          </h2>
+        </div>
+        
+        <div className="flex-shrink-0">
+          <h3 className="font-display text-lg tracking-wide whitespace-nowrap">
+            {gameName}
+          </h3>
+        </div>
 
-        {hasSelectedItem && (
-          <span className="text-xs text-accent animate-pulse">
-            Clique em um espaço para classificar
-          </span>
-        )}
+        <div className="flex-1 flex justify-end">
+          {hasSelectedItem && (
+            <span className="text-xs text-accent animate-pulse text-right">
+              Clique em um espaço para classificar
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-x-auto overflow-y-hidden p-4">

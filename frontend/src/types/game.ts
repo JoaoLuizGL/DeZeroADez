@@ -1,3 +1,10 @@
+export interface Game {
+  id: string;
+  name: string;
+  description: string;
+  items: GameItem[];
+}
+
 export interface GameItem {
   id: string;
   name: string;
