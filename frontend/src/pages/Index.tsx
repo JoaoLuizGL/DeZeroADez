@@ -1,110 +1,59 @@
-import { useState, useCallback } from "react";
-import { GameItem, PlacedItem } from "@/types/game";
-import { sampleItems } from "@/data/sampleItems";
-import ItemList from "@/components/game/ItemList";
-import RatingBoard from "@/components/game/RatingBoard";
-
-const SLOT_LIMITS: Record<number, number> = {
-  0: 3, 1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3, 7: 3, 8: 3, 9: 3, 10: 3,
-};
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Users, Code } from "lucide-react";
+import { sampleGames } from "@/data/sampleItems";
 
 const Index = () => {
-  const [availableItems, setAvailableItems] = useState<GameItem[]>(sampleItems);
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-  const [placedItems, setPlacedItems] = useState<PlacedItem[]>([]);
+  const navigate = useNavigate();
 
-  const handleSelectItem = useCallback((id: string) => {
-    setSelectedItemId((prev) => (prev === id ? null : id));
-  }, []);
-
-  const handlePlaceItem = useCallback(
-    (rating: number, slotIndex: number) => {
-      if (!selectedItemId) return;
-
-      const availableItem = availableItems.find((i) => i.id === selectedItemId);
-      const placedItem = placedItems.find((i) => i.id === selectedItemId);
-      
-      if (!availableItem && !placedItem) return;
-
-      const itemToPlace = availableItem || placedItem!;
-
-      // ✅ Regra: Slots 0 e 10 (index 0) só aceitam se for o ÚLTIMO item TOTAL a ser colocado
-      const isSpecialSlot0 = (rating === 0 || rating === 10) && slotIndex === 0;
-      if (isSpecialSlot0) {
-        if (availableItem && availableItems.length > 1) return;
-        if (placedItem && availableItems.length > 0) return;
-      }
-
-      const slotLimit = SLOT_LIMITS[rating];
-
-      // Prevent exceeding slot limit
-      const ratingItems = placedItems.filter((i) => i.rating === rating);
-      if (ratingItems.length >= slotLimit && (!placedItem || placedItem.rating !== rating)) {
-        return;
-      }
-
-      // Prevent overwriting an occupied slot
-      const slotOccupied = placedItems.some(
-        (i) => i.rating === rating && i.slotIndex === slotIndex
-      );
-      if (slotOccupied) return;
-
-      if (availableItem) {
-        setPlacedItems((prev) => [
-          ...prev,
-          { ...availableItem, rating, slotIndex },
-        ]);
-        setAvailableItems((prev) =>
-          prev.filter((i) => i.id !== selectedItemId)
-        );
-      } else {
-        setPlacedItems((prev) =>
-          prev.map((i) =>
-            i.id === selectedItemId ? { ...i, rating, slotIndex } : i
-          )
-        );
-      }
-
-      setSelectedItemId(null);
-    },
-    [selectedItemId, availableItems, placedItems]
-  );
-
-  const handleRemoveItem = useCallback(
-    (itemId: string) => {
-      const item = placedItems.find((i) => i.id === itemId);
-      if (!item) return;
-      setPlacedItems((prev) => prev.filter((i) => i.id !== itemId));
-      setAvailableItems((prev) => [...prev, { id: item.id, name: item.name, imageUrl: item.imageUrl }]);
-      
-      // If the item being removed was selected, deselect it
-      if (selectedItemId === itemId) {
-        setSelectedItemId(null);
-      }
-    },
-    [placedItems, selectedItemId]
-  );
+  const getIcon = (gameId: string) => {
+    switch (gameId) {
+      case "1": return <Users className="w-8 h-8" />;
+      case "2": return <Code className="w-8 h-8" />;
+      default: return <Users className="w-8 h-8" />;
+    }
+  };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      {/* Sidebar */}
-      <div className="w-56 flex-shrink-0">
-        <ItemList
-          items={availableItems}
-          selectedItemId={selectedItemId}
-          onSelectItem={handleSelectItem}
-        />
-      </div>
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-4xl mx-auto">
+        <header className="mb-12 text-center">
+          <h1 className="text-4xl font-bold tracking-tight mb-4">De Zero a Dez</h1>
+          <p className="text-xl text-muted-foreground">
+            Select a theme and start rating!
+          </p>
+        </header>
 
-      {/* Main board */}
-      <RatingBoard
-        placedItems={placedItems}
-        selectedItemId={selectedItemId}
-        availableItemsCount={availableItems.length}
-        onPlaceItem={handlePlaceItem}
-        onRemoveItem={handleRemoveItem}
-        onSelectItem={handleSelectItem}
-      />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sampleGames.map((game) => (
+            <Card 
+              key={game.id} 
+              className="group hover:border-primary transition-colors cursor-pointer"
+              onClick={() => navigate(`/game/${game.id}`)}
+            >
+              <CardHeader>
+                <div className="mb-4 text-primary group-hover:scale-110 transition-transform duration-200">
+                  {getIcon(game.id)}
+                </div>
+                <CardTitle>{game.name}</CardTitle>
+                <CardDescription>{game.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full">Play Now</Button>
+              </CardContent>
+            </Card>
+          ))}
+          
+          {/* Placeholder for future themes */}
+          <Card className="border-dashed border-2 flex flex-col items-center justify-center p-6 bg-muted/20 opacity-60">
+            <CardHeader className="text-center">
+              <CardTitle className="text-muted-foreground">More coming soon...</CardTitle>
+              <CardDescription>Stay tuned for new themes</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
