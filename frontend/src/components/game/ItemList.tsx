@@ -1,5 +1,6 @@
 import { GameItem } from "@/types/game";
 import ItemCard from "./ItemCard";
+import BackButton from "../BackButton";
 
 interface ItemListProps {
   items: GameItem[];
@@ -10,6 +11,9 @@ interface ItemListProps {
 const ItemList = ({ items, selectedItemId, onSelectItem }: ItemListProps) => {
   return (
     <div className="flex flex-col h-full w-[12.5vw] bg-card border-r-2 border-border">
+      <div className="px-3 py-1 border-b border-border">
+        <BackButton />
+      </div>
       <div className="p-3 border-b border-border">
         <h2 className="font-display text-2xl text-primary tracking-wide">ITENS</h2>
         <p className="text-xs text-muted-foreground">
