@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Upload, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,21 +19,36 @@ import { cn } from "@/lib/utils";
 
 const CreateGame = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<GameItem[]>([]);
   const [newItemName, setNewItemName] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<GameItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const MAX_ITEMS = 29;
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleOpenAddDialog = () => {
     setEditingItem(null);
     setNewItemName("");
+    setImagePreview(null);
     setIsDialogOpen(true);
   };
 
   const handleOpenEditDialog = (item: GameItem) => {
     setEditingItem(item);
     setNewItemName(item.name);
+    setImagePreview(item.imageUrl !== "/placeholder.svg" ? item.imageUrl : null);
     setIsDialogOpen(true);
   };
 
@@ -43,22 +58,25 @@ const CreateGame = () => {
     
     if (!newItemName.trim()) return;
 
+    const imageUrl = imagePreview || "/placeholder.svg";
+
     if (editingItem) {
       // Update existing item
       setItems(items.map(item => 
-        item.id === editingItem.id ? { ...item, name: newItemName.trim() } : item
+        item.id === editingItem.id ? { ...item, name: newItemName.trim(), imageUrl } : item
       ));
     } else if (items.length < MAX_ITEMS) {
       // Add new item
       const newItem: GameItem = {
         id: Math.random().toString(36).substring(2, 9),
         name: newItemName.trim(),
-        imageUrl: "/placeholder.svg",
+        imageUrl,
       };
       setItems([...items, newItem]);
     }
     
     setNewItemName("");
+    setImagePreview(null);
     setEditingItem(null);
     setIsDialogOpen(false);
   };
@@ -87,15 +105,47 @@ const CreateGame = () => {
         if (!open) {
           setEditingItem(null);
           setNewItemName("");
+          setImagePreview(null);
         }
       }}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
               {editingItem ? "Edit Item" : `Add New Item (${items.length + 1}/${MAX_ITEMS})`}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSaveItem} className="space-y-4 pt-4">
+          <form onSubmit={handleSaveItem} className="space-y-6 pt-4">
+            <div className="flex flex-col items-center gap-4">
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="relative w-32 h-32 rounded-md border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors cursor-pointer overflow-hidden group bg-secondary/50 flex flex-col items-center justify-center gap-2"
+              >
+                {imagePreview ? (
+                  <>
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Upload className="w-8 h-8 text-white" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <ImageIcon className="w-10 h-10 text-muted-foreground" />
+                    <span className="text-[10px] font-medium text-muted-foreground uppercase">Upload Image</span>
+                  </>
+                )}
+              </div>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleImageChange} 
+                accept="image/*" 
+                className="hidden" 
+              />
+              <p className="text-[10px] text-muted-foreground text-center">
+                Recommended: Square image (1:1)
+              </p>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="item-name">Item Name</Label>
               <Input 
