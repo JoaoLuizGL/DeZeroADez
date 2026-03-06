@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/SearchInput";
-import { Users, Code } from "lucide-react";
+import { Users, Code, Plus } from "lucide-react";
 import { sampleGames } from "@/data/sampleItems";
 
 const Index = () => {
@@ -40,6 +40,17 @@ const Index = () => {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card 
+            className="group bg-primary text-primary-foreground hover:scale-[1.02] transition-all duration-300 cursor-pointer flex flex-col items-center justify-center p-6 text-center border-none shadow-lg hover:shadow-primary/20"
+            onClick={() => navigate("/create-game")}
+          >
+            <div className="mb-4 p-3 rounded-full bg-primary-foreground/10 text-primary-foreground group-hover:scale-110 transition-transform duration-200">
+              <Plus className="w-8 h-8" />
+            </div>
+            <CardTitle className="mb-2">Create New Game</CardTitle>
+            <CardDescription className="text-primary-foreground/70">Start your own rating list from scratch</CardDescription>
+          </Card>
+
           {filteredGames.map((game) => (
             <Card 
               key={game.id} 
@@ -54,7 +65,7 @@ const Index = () => {
                 <CardDescription>{game.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">Play Now</Button>
+                <Button variant="secondary" className="w-full">Play Now</Button>
               </CardContent>
             </Card>
           ))}
