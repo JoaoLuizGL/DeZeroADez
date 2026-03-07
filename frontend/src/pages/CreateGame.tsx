@@ -269,7 +269,7 @@ const CreateGame = () => {
                 </Button>
                 <Button 
                   type="submit" 
-                  variant="secondary" 
+                  variant="outline" 
                   className="flex-1"
                   disabled={items.length === 0}
                 >
