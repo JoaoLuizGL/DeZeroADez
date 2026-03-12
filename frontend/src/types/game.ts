@@ -2,6 +2,7 @@ export interface Game {
   id: string;
   name: string;
   description: string;
+  imageUrl?: string;
   items: GameItem[];
 }
 
