@@ -1,0 +1,19 @@
+import mongoose from 'mongoose';
+
+const gameItemSchema = new mongoose.Schema({
+  id: { type: String, required: true },
+  name: { type: String, required: true },
+  imageUrl: { type: String, required: true },
+});
+
+const themeSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  imageUrl: { type: String },
+  items: [gameItemSchema],
+}, {
+  timestamps: true,
+  collection: 'themes'
+});
+
+export const Theme = mongoose.model('Theme', themeSchema);

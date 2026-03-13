@@ -1,6 +1,7 @@
 import express from 'express';
 import type { Request, Response } from 'express';
 import cors from 'cors';
+import { Theme } from './models/Theme';
 
 const app = express();
 
@@ -8,9 +9,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Health route
-app.get('/health', (req: Request, res: Response) => {
-  res.status(200).json({ status: 'ok', message: 'Backend is running' });
+// Get all themes
+app.get('/', async (req: Request, res: Response) => {
+  try {
+    const themes = await Theme.find();
+    res.status(200).json(themes);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch themes' });
+  }
 });
 
 export default app;
