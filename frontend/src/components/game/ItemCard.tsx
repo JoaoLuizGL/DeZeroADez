@@ -11,7 +11,7 @@ interface ItemCardProps {
 }
 
 const ItemCard = ({ item, isSelected, onClick, size = "md" }: ItemCardProps) => {
-  const sizeClasses = (size === "sm" ? "size-24" : "size-40") + " w-fit";
+  const sizeClasses = (size === "sm" ? "h-24" : "h-40") + " w-full";
   const { displayUrl, loading } = useImageProxy(item.imageUrl);
 
   return (
