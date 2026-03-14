@@ -20,6 +20,30 @@ app.get('/', async (req: Request, res: Response) => {
   }
 });
 
+// Create a new theme
+app.post('/', async (req: Request, res: Response) => {
+  try {
+    const { name, description, imageUrl, items, creator } = req.body;
+
+    if (!name || !description || !items || !Array.isArray(items)) {
+      return res.status(400).json({ error: 'Missing required fields: name, description, and items (array)' });
+    }
+
+    const newTheme = new Theme({
+      name,
+      description,
+      imageUrl,
+      items,
+      creator: creator || 'Original',
+    });
+
+    const savedTheme = await newTheme.save();
+    res.status(201).json(savedTheme);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create theme' });
+  }
+});
+
 // Get a single theme by ID
 app.get('/:id', async (req: Request, res: Response) => {
   try {
