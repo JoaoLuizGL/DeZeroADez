@@ -104,6 +104,28 @@ const CreateGame = () => {
 
     setIsSaving(true);
     try {
+      // 1. Upload images first if they are base64
+      const processedItems = await Promise.all(items.map(async (item) => {
+        // If it's a base64 image, upload it
+        if (item.imageUrl.startsWith("data:image")) {
+          const imgResponse = await fetch("http://localhost:5000/images", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data: item.imageUrl }),
+          });
+          
+          if (!imgResponse.ok) {
+            throw new Error(`Failed to upload image for ${item.name}`);
+          }
+          
+          const imgData = await imgResponse.json();
+          // Replace base64 with the image ID or a URL path
+          return { ...item, imageUrl: imgData.id };
+        }
+        return item;
+      }));
+
+      // 2. Create the theme with processed item image URLs
       const response = await fetch("http://localhost:5000/", {
         method: "POST",
         headers: {
@@ -112,7 +134,7 @@ const CreateGame = () => {
         body: JSON.stringify({
           name,
           description,
-          items,
+          items: processedItems,
         }),
       });
 
