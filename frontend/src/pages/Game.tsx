@@ -1,9 +1,10 @@
-import { useState, useCallback, useMemo } from "react";
-import { useParams } from "react-router-dom";
-import { ThemeItem, PlacedItem } from "@/types/theme";
-import { sampleGames } from "@/data/sampleItems";
+import { useState, useCallback, useMemo, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { ThemeItem, PlacedItem, Theme } from "@/types/theme";
 import ItemList from "@/components/game/ItemList";
 import RatingBoard from "@/components/game/RatingBoard";
+import { Loader2, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const SLOT_LIMITS: Record<number, number> = {
   0: 3, 1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3, 7: 3, 8: 3, 9: 3, 10: 3,
@@ -11,21 +12,47 @@ const SLOT_LIMITS: Record<number, number> = {
 
 const GamePage = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   
-  const currentGame = useMemo(() => {
-    return sampleGames.find(g => g.id === id) || sampleGames[0];
-  }, [id]);
-
-  const [availableItems, setAvailableItems] = useState<ThemeItem[]>(currentGame.items);
+  const [currentGame, setCurrentGame] = useState<Theme | null>(null);
+  const [availableItems, setAvailableItems] = useState<ThemeItem[]>([]);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [placedItems, setPlacedItems] = useState<PlacedItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Reset state when game changes
-  useMemo(() => {
-    setAvailableItems(currentGame.items);
-    setPlacedItems([]);
-    setSelectedItemId(null);
-  }, [currentGame]);
+  useEffect(() => {
+    const fetchGame = async () => {
+      if (!id) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const response = await fetch(`http://localhost:5000/${id}`);
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error("Game not found");
+          }
+          throw new Error("Failed to fetch game");
+        }
+        const data = await response.json() as Theme & { _id: string };
+        const mappedGame = {
+          ...data,
+          id: data._id || data.id
+        };
+        setCurrentGame(mappedGame);
+        setAvailableItems(mappedGame.items);
+      } catch (err) {
+        console.error("Error fetching game:", err);
+        setError(err instanceof Error ? err.message : "Could not load the game.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGame();
+  }, [id]);
 
   const handleSelectItem = useCallback((id: string) => {
     setSelectedItemId((prev) => (prev === id ? null : id));
@@ -98,6 +125,26 @@ const GamePage = () => {
     },
     [placedItems, selectedItemId]
   );
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-background">
+        <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
+        <p className="text-xl text-muted-foreground">Loading game...</p>
+      </div>
+    );
+  }
+
+  if (error || !currentGame) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-background p-4 text-center">
+        <AlertCircle className="w-16 h-16 text-destructive mb-4" />
+        <h2 className="text-2xl font-bold mb-2">Oops!</h2>
+        <p className="text-muted-foreground mb-6">{error || "Something went wrong"}</p>
+        <Button onClick={() => navigate("/")}>Back to Themes</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">

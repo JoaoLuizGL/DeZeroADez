@@ -1,4 +1,5 @@
 export interface Theme {
+  _id?: string;
   id: string;
   name: string;
   description: string;
@@ -8,6 +9,7 @@ export interface Theme {
 }
 
 export interface ThemeItem {
+  _id?: string;
   id: string;
   name: string;
   imageUrl: string;

@@ -86,15 +86,49 @@ const CreateGame = () => {
     setItems(items.filter(item => item.id !== id));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const form = e.target as HTMLFormElement;
+    const name = (form.elements.namedItem("name") as HTMLInputElement).value;
+    const description = (form.elements.namedItem("description") as HTMLTextAreaElement).value;
+
     if (items.length === 0) {
       alert("Please add at least one item to the game.");
       return;
     }
-    // Logic to save the game will be implemented later
-    console.log("Saving new game with items:", items);
-    navigate("/");
+
+    console.log("Submitting new game with data:", JSON.stringify({ name, description, items }));
+
+    setIsSaving(true);
+    try {
+      const response = await fetch("http://localhost:5000/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          description,
+          items,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save the game");
+      }
+
+      const savedGame = await response.json();
+      console.log("Saved new game:", savedGame);
+      navigate("/");
+    } catch (err) {
+      console.error("Error saving game:", err);
+      alert("Failed to save the game. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -191,12 +225,13 @@ const CreateGame = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="name">Game Name</Label>
-                <Input id="name" placeholder="e.g., Best Programming Languages" required />
+                <Input id="name" placeholder="e.g., Best Programming Languages" required name="name" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea 
                   id="description" 
+                  name="description"
                   placeholder="Describe what people will be rating..." 
                   className="min-h-[100px]"
                   required
@@ -264,16 +299,16 @@ const CreateGame = () => {
               </div>
 
               <div className="flex gap-4 pt-4">
-                <Button type="button" variant="outline" className="flex-1" onClick={() => navigate("/")}>
+                <Button type="button" variant="outline" className="flex-1" onClick={() => navigate("/")} disabled={isSaving}>
                   Cancel
                 </Button>
                 <Button 
                   type="submit" 
-                  variant="outline" 
-                  className="flex-1"
-                  disabled={items.length === 0}
+                  variant="default" 
+                  className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+                  disabled={items.length === 0 || isSaving}
                 >
-                  Create Game
+                  {isSaving ? "Creating..." : "Create Game"}
                 </Button>
               </div>
             </form>
