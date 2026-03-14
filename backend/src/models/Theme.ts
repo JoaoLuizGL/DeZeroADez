@@ -10,6 +10,7 @@ const themeSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
   imageUrl: { type: String },
+  creator: { type: String, default: 'Original' },
   items: [gameItemSchema],
 }, {
   timestamps: true,
