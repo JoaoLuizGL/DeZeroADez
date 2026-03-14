@@ -1,6 +1,6 @@
-import { Game, GameItem } from "@/types/game";
+import { Theme, ThemeItem } from "@/types/theme";
 
-const footballPlayers: GameItem[] = [
+const footballPlayers: ThemeItem[] = [
   { 
     id: "f1", 
     name: "Lionel Messi", 
@@ -53,7 +53,7 @@ const footballPlayers: GameItem[] = [
   }
 ];
 
-const programmingLanguages: GameItem[] = [
+const programmingLanguages: ThemeItem[] = [
   {
     id: "p1",
     name: "Python",
@@ -106,7 +106,7 @@ const programmingLanguages: GameItem[] = [
   }
 ];
 
-export const sampleGames: Game[] = [
+export const sampleGames: Theme[] = [
   {
     id: "1",
     name: "Top 10 Football Players",

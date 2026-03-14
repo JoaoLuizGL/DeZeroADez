@@ -1,9 +1,9 @@
-import { GameItem } from "@/types/game";
+import { ThemeItem } from "@/types/theme";
 import ItemCard from "./ItemCard";
 import BackButton from "../BackButton";
 
 interface ItemListProps {
-  items: GameItem[];
+  items: ThemeItem[];
   selectedItemId: string | null;
   onSelectItem: (id: string) => void;
 }

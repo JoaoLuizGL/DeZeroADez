@@ -14,16 +14,16 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import BackButton from "@/components/BackButton";
-import { GameItem } from "@/types/game";
+import { ThemeItem } from "@/types/theme";
 import { cn } from "@/lib/utils";
 
 const CreateGame = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [items, setItems] = useState<GameItem[]>([]);
+  const [items, setItems] = useState<ThemeItem[]>([]);
   const [newItemName, setNewItemName] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [editingItem, setEditingItem] = useState<GameItem | null>(null);
+  const [editingItem, setEditingItem] = useState<ThemeItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const MAX_ITEMS = 29;
 
@@ -45,7 +45,7 @@ const CreateGame = () => {
     setIsDialogOpen(true);
   };
 
-  const handleOpenEditDialog = (item: GameItem) => {
+  const handleOpenEditDialog = (item: ThemeItem) => {
     setEditingItem(item);
     setNewItemName(item.name);
     setImagePreview(item.imageUrl !== "/placeholder.svg" ? item.imageUrl : null);
@@ -67,7 +67,7 @@ const CreateGame = () => {
       ));
     } else if (items.length < MAX_ITEMS) {
       // Add new item
-      const newItem: GameItem = {
+      const newItem: ThemeItem = {
         id: Math.random().toString(36).substring(2, 9),
         name: newItemName.trim(),
         imageUrl,

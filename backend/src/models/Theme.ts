@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const gameItemSchema = new mongoose.Schema({
+const ThemeItemSchema = new mongoose.Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
   imageUrl: { type: String, required: true },
@@ -11,7 +11,7 @@ const themeSchema = new mongoose.Schema({
   description: { type: String, required: true },
   imageUrl: { type: String },
   creator: { type: String, default: 'Original' },
-  items: [gameItemSchema],
+  items: [ThemeItemSchema],
 }, {
   timestamps: true,
   collection: 'themes'

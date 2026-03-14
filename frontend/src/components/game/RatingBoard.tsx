@@ -1,4 +1,4 @@
-import { PlacedItem } from "@/types/game";
+import { PlacedItem } from "@/types/theme";
 import NumberSlot from "./NumberSlot";
 
 interface RatingBoardProps {

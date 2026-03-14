@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { GameItem, PlacedItem } from "@/types/game";
+import { ThemeItem, PlacedItem } from "@/types/theme";
 import { sampleGames } from "@/data/sampleItems";
 import ItemList from "@/components/game/ItemList";
 import RatingBoard from "@/components/game/RatingBoard";
@@ -16,7 +16,7 @@ const GamePage = () => {
     return sampleGames.find(g => g.id === id) || sampleGames[0];
   }, [id]);
 
-  const [availableItems, setAvailableItems] = useState<GameItem[]>(currentGame.items);
+  const [availableItems, setAvailableItems] = useState<ThemeItem[]>(currentGame.items);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [placedItems, setPlacedItems] = useState<PlacedItem[]>([]);
 

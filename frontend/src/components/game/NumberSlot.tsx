@@ -1,4 +1,4 @@
-import { PlacedItem } from "@/types/game";
+import { PlacedItem } from "@/types/theme";
 import { cn } from "@/lib/utils";
 import { X, Star } from "lucide-react";
 

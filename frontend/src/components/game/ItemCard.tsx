@@ -1,8 +1,8 @@
-import { GameItem } from "@/types/game";
+import { ThemeItem } from "@/types/theme";
 import { cn } from "@/lib/utils";
 
 interface ItemCardProps {
-  item: GameItem;
+  item: ThemeItem;
   isSelected: boolean;
   onClick: () => void;
   size?: "sm" | "md";
