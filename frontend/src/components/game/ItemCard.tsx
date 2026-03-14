@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
 import { ThemeItem } from "@/types/theme";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import { useImageProxy } from "@/hooks/useImageProxy";
 
 interface ItemCardProps {
   item: ThemeItem;
@@ -12,33 +12,7 @@ interface ItemCardProps {
 
 const ItemCard = ({ item, isSelected, onClick, size = "md" }: ItemCardProps) => {
   const sizeClasses = (size === "sm" ? "size-24" : "size-40") + " w-fit";
-  const [displayUrl, setDisplayUrl] = useState(item.imageUrl);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // Check if the URL is a MongoDB ObjectId (24 hex characters)
-    const isMongoId = /^[0-9a-fA-F]{24}$/.test(item.imageUrl);
-    
-    if (isMongoId) {
-      const fetchImage = async () => {
-        setLoading(true);
-        try {
-          const response = await fetch(`http://localhost:5000/images/${item.imageUrl}`);
-          if (response.ok) {
-            const data = await response.json();
-            setDisplayUrl(data.data);
-          }
-        } catch (error) {
-          console.error("Error fetching image:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchImage();
-    } else {
-      setDisplayUrl(item.imageUrl);
-    }
-  }, [item.imageUrl]);
+  const { displayUrl, loading } = useImageProxy(item.imageUrl);
 
   return (
     <button

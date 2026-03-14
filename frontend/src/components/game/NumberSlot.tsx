@@ -1,17 +1,41 @@
 import { PlacedItem } from "@/types/theme";
 import { cn } from "@/lib/utils";
-import { X, Star } from "lucide-react";
+import { X, Star, Loader2 } from "lucide-react";
+import { useImageProxy } from "@/hooks/useImageProxy";
 
 interface NumberSlotProps {
   rating: number;
   slots: number;
-  placedItems: PlacedItem[];
+  placedItems: (PlacedItem | null)[];
   selectedItemId: string | null;
   availableItemsCount: number;
   onPlaceItem: (rating: number, slotIndex: number) => void;
   onRemoveItem: (itemId: string) => void;
   onSelectItem: (id: string) => void;
 }
+
+const PlacedItemImage = ({ item, isSelected }: { item: PlacedItem; isSelected: boolean }) => {
+  const { displayUrl, loading } = useImageProxy(item.imageUrl);
+  
+  return (
+    <>
+      {loading ? (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-accent" />
+        </div>
+      ) : (
+        <img
+          src={displayUrl}
+          alt={item.name}
+          className={cn(
+            "w-full h-full object-cover transition-all duration-300",
+            isSelected && "group-hover/slot:scale-95"
+          )}
+        />
+      )}
+    </>
+  );
+};
 
 const NumberSlot = ({
   rating,
@@ -90,14 +114,7 @@ const NumberSlot = ({
         >
           {placed ? (
             <>
-              <img
-                src={placed.imageUrl}
-                alt={placed.name}
-                className={cn(
-                  "w-full h-full object-cover transition-all duration-300",
-                  isSelected && "group-hover/slot:scale-95"
-                )}
-              />
+              <PlacedItemImage item={placed} isSelected={!!isSelected} />
 
               <div className={cn(
                 "absolute bottom-0 left-0 right-0 px-1 py-1 min-h-[2.5vw] flex items-center transition-colors duration-200",
