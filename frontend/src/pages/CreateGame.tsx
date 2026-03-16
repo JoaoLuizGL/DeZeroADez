@@ -20,9 +20,11 @@ import { cn } from "@/lib/utils";
 const CreateGame = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const themeImageInputRef = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<ThemeItem[]>([]);
   const [newItemName, setNewItemName] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [themeImagePreview, setThemeImagePreview] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<ThemeItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const MAX_ITEMS = 29;
@@ -33,6 +35,17 @@ const CreateGame = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleThemeImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setThemeImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -104,7 +117,24 @@ const CreateGame = () => {
 
     setIsSaving(true);
     try {
-      // 1. Upload images first if they are base64
+      // 1. Upload theme image if it's base64
+      let finalThemeImageUrl = themeImagePreview || "/placeholder.svg";
+      if (themeImagePreview?.startsWith("data:image")) {
+        const themeImgResponse = await fetch("http://localhost:5000/images", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: themeImagePreview }),
+        });
+        
+        if (!themeImgResponse.ok) {
+          throw new Error("Failed to upload theme image");
+        }
+        
+        const themeImgData = await themeImgResponse.json();
+        finalThemeImageUrl = themeImgData.id;
+      }
+
+      // 2. Upload item images if they are base64
       const processedItems = await Promise.all(items.map(async (item) => {
         // If it's a base64 image, upload it
         if (item.imageUrl.startsWith("data:image")) {
@@ -125,7 +155,7 @@ const CreateGame = () => {
         return item;
       }));
 
-      // 2. Create the theme with processed item image URLs
+      // 3. Create the theme with processed item image URLs
       const response = await fetch("http://localhost:5000/", {
         method: "POST",
         headers: {
@@ -134,6 +164,7 @@ const CreateGame = () => {
         body: JSON.stringify({
           name,
           description,
+          imageUrl: finalThemeImageUrl,
           items: processedItems,
         }),
       });
@@ -245,10 +276,42 @@ const CreateGame = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Game Name</Label>
-                <Input id="name" placeholder="e.g., Best Programming Languages" required name="name" />
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex-1 space-y-2">
+                  <Label htmlFor="name">Game Name</Label>
+                  <Input id="name" placeholder="e.g., Best Programming Languages" required name="name" />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Theme Image</Label>
+                  <div 
+                    onClick={() => themeImageInputRef.current?.click()}
+                    className="relative w-24 h-24 rounded-md border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors cursor-pointer overflow-hidden group bg-secondary/50 flex flex-col items-center justify-center gap-1"
+                  >
+                    {themeImagePreview ? (
+                      <>
+                        <img src={themeImagePreview} alt="Theme preview" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Upload className="w-5 h-5 text-white" />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <ImageIcon className="w-6 h-6 text-muted-foreground" />
+                        <span className="text-[8px] font-medium text-muted-foreground uppercase">Upload</span>
+                      </>
+                    )}
+                  </div>
+                  <input 
+                    type="file" 
+                    ref={themeImageInputRef} 
+                    onChange={handleThemeImageChange} 
+                    accept="image/*" 
+                    className="hidden" 
+                  />
+                </div>
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea 

@@ -3,8 +3,36 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/SearchInput";
-import { Users, Code, Plus, Gamepad2, Loader2 } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import { Theme } from "@/types/theme";
+import { useImageProxy } from "@/hooks/useImageProxy";
+
+const GameCard = ({ game, onClick }: { game: Theme; onClick: () => void }) => {
+  const { displayUrl } = useImageProxy(game.imageUrl || "");
+  
+  return (
+    <Card 
+      className="group relative overflow-hidden h-[280px] hover:border-primary transition-all cursor-pointer flex flex-col justify-end border-none shadow-md"
+      onClick={onClick}
+      style={{
+        backgroundImage: displayUrl ? `url(${displayUrl})` : "linear-gradient(to bottom, #3b82f6, #1e3a8a)",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 group-hover:from-black transition-opacity duration-300" />
+      <CardHeader className="relative z-10 text-white p-5">
+        <CardTitle className="text-xl mb-1 group-hover:text-primary transition-colors">{game.name}</CardTitle>
+        <CardDescription className="line-clamp-2 text-white/80 text-sm leading-relaxed">{game.description}</CardDescription>
+      </CardHeader>
+      <CardContent className="relative z-10 p-5 pt-0">
+        <Button variant="secondary" className="w-full font-bold group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+          Play Now
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
 
 const Index = () => {
   const navigate = useNavigate();
@@ -39,13 +67,6 @@ const Index = () => {
     fetchGames();
   }, []);
 
-  const getIcon = (gameId: string) => {
-    // Basic mapping for sample IDs, default icon for others
-    if (gameId.includes("football") || gameId === "1") return <Users className="w-8 h-8" />;
-    if (gameId.includes("code") || gameId === "2") return <Code className="w-8 h-8" />;
-    return <Gamepad2 className="w-8 h-8" />;
-  };
-
   const filteredGames = games.filter((game) =>
     game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     game.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -53,9 +74,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background p-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <header className="mb-12 text-center">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">De Zero a Dez</h1>
+          <h1 className="text-5xl font-extrabold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+            De Zero a Dez
+          </h1>
           <p className="text-xl text-muted-foreground mb-8">
             Select a theme and start rating!
           </p>
@@ -78,35 +101,24 @@ const Index = () => {
             <Button onClick={() => window.location.reload()}>Retry</Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card 
-              className="group bg-primary text-primary-foreground hover:scale-[1.02] transition-all duration-300 cursor-pointer flex flex-col items-center justify-center p-6 text-center border-none shadow-lg hover:shadow-primary/20"
+              className="group h-[280px] bg-primary text-primary-foreground hover:scale-[1.02] transition-all duration-300 cursor-pointer flex flex-col items-center justify-center p-6 text-center border-none shadow-lg hover:shadow-primary/20"
               onClick={() => navigate("/create-game")}
             >
-              <div className="mb-4 p-3 rounded-full bg-primary-foreground/10 text-primary-foreground group-hover:scale-110 transition-transform duration-200">
-                <Plus className="w-8 h-8" />
+              <div className="mb-4 p-4 rounded-full bg-primary-foreground/10 text-primary-foreground group-hover:scale-110 transition-transform duration-200">
+                <Plus className="w-10 h-10" />
               </div>
-              <CardTitle className="mb-2">Create New Game</CardTitle>
-              <CardDescription className="text-primary-foreground/70">Start your own rating list from scratch</CardDescription>
+              <CardTitle className="text-2xl mb-2">Create New Game</CardTitle>
+              <CardDescription className="text-primary-foreground/70 text-base">Start your own rating list from scratch</CardDescription>
             </Card>
 
             {filteredGames.map((game) => (
-              <Card 
+              <GameCard 
                 key={game.id} 
-                className="group hover:border-primary transition-colors cursor-pointer"
-                onClick={() => navigate(`/game/${game.id}`)}
-              >
-                <CardHeader>
-                  <div className="mb-4 text-primary group-hover:scale-110 transition-transform duration-200">
-                    {getIcon(game.id)}
-                  </div>
-                  <CardTitle>{game.name}</CardTitle>
-                  <CardDescription className="line-clamp-2">{game.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="secondary" className="w-full">Play Now</Button>
-                </CardContent>
-              </Card>
+                game={game} 
+                onClick={() => navigate(`/game/${game.id}`)} 
+              />
             ))}
             
             {filteredGames.length === 0 && searchQuery && (
@@ -116,7 +128,7 @@ const Index = () => {
             )}
 
             {!searchQuery && (
-              <Card className="border-dashed border-2 flex flex-col items-center justify-center p-6 bg-muted/20 opacity-60">
+              <Card className="border-dashed border-2 h-[280px] flex flex-col items-center justify-center p-6 bg-muted/20 opacity-60">
                 <CardHeader className="text-center">
                   <CardTitle className="text-muted-foreground">More coming soon...</CardTitle>
                   <CardDescription>Stay tuned for new themes</CardDescription>
