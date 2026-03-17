@@ -74,11 +74,8 @@ const NumberSlot = ({
         <div
           onClick={() => {
             if (placed) {
-              if (isSelected) {
-                onRemoveItem(placed.id);
-              } else {
-                onSelectItem(placed.id);
-              }
+              // Toggle selection: if already selected, deselect (onSelectItem(id) in Game.tsx handles toggle)
+              onSelectItem(placed.id);
             } else if (canReceive) {
               onPlaceItem(rating, idx);
             }
@@ -127,12 +124,6 @@ const NumberSlot = ({
                   {placed.name}
                 </span>
               </div>
-
-              {isSelected && (
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/slot:opacity-100 transition-opacity duration-200 flex items-center justify-center z-10">
-                  <X className="w-10 h-10 text-white drop-shadow-md" />
-                </div>
-              )}
             </>
           ) : (
             <>

@@ -126,6 +126,10 @@ const GamePage = () => {
     [placedItems, selectedItemId]
   );
 
+  const isPlacedItemSelected = useMemo(() => {
+    return placedItems.some((i) => i.id === selectedItemId);
+  }, [placedItems, selectedItemId]);
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-background">
@@ -154,6 +158,8 @@ const GamePage = () => {
           items={availableItems}
           selectedItemId={selectedItemId}
           onSelectItem={handleSelectItem}
+          onRemoveItem={handleRemoveItem}
+          isPlacedItemSelected={isPlacedItemSelected}
         />
       </div>
 
