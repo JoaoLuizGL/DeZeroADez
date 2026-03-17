@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { ThemeItem } from "@/types/theme";
 import ItemCard from "./ItemCard";
 import BackButton from "../BackButton";
+import { SearchInput } from "../SearchInput";
 import { cn } from "@/lib/utils";
 import { X, ArrowDownAZ, ArrowUpAZ } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,16 +23,24 @@ const ItemList = ({
   isPlacedItemSelected 
 }: ItemListProps) => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredItems = useMemo(() => {
+    if (!searchQuery.trim()) return items;
+    return items.filter((item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [items, searchQuery]);
 
   const sortedItems = useMemo(() => {
-    return [...items].sort((a, b) => {
+    return [...filteredItems].sort((a, b) => {
       if (sortOrder === 'asc') {
         return a.name.localeCompare(b.name);
       } else {
         return b.name.localeCompare(a.name);
       }
     });
-  }, [items, sortOrder]);
+  }, [filteredItems, sortOrder]);
 
   const toggleSort = () => {
     setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
@@ -79,11 +88,17 @@ const ItemList = ({
             )}
           </Button>
         </div>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-3">
           <p className="text-xs text-muted-foreground">
             {items.length} {items.length === 1 ? "item" : "itens"} disponíveis
           </p>
         </div>
+        <SearchInput 
+          value={searchQuery} 
+          onChange={setSearchQuery} 
+          placeholder="Buscar item..."
+          className="max-w-none"
+        />
       </div>
       <div className="flex-1 overflow-y-auto no-scrollbar p-3">
         <div className="grid grid-cols-1 gap-3">
@@ -98,9 +113,11 @@ const ItemList = ({
             />
           ))}
         </div>
-        {items.length === 0 && (
-          <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
-            Todos os itens foram classificados!
+        {sortedItems.length === 0 && (
+          <div className="flex items-center justify-center h-32 text-muted-foreground text-sm text-center px-4">
+            {items.length === 0 
+              ? "Todos os itens foram classificados!" 
+              : "Nenhum item encontrado para esta busca."}
           </div>
         )}
       </div>
