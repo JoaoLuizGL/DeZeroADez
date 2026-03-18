@@ -2,8 +2,11 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 import { Theme } from './models/Theme';
 import { Image } from './models/Image';
+import { User } from './models/User';
+import { config } from './config';
 
 const app = express();
 
@@ -11,6 +14,74 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Auth Routes
+app.post('/signup', async (req: Request, res: Response) => {
+  try {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(409).json({ error: 'User already exists' });
+    }
+
+    const newUser = new User({ username, email, password });
+    await newUser.save();
+
+    const token = jwt.sign({ id: newUser._id }, config.jwtSecret, { expiresIn: '1d' });
+
+    res.status(201).json({
+      token,
+      user: {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
+app.post('/login', async (req: Request, res: Response) => {
+  try {
+    const { login, password } = req.body;
+
+    if (!login || !password) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const user: any = await User.findOne({ 
+      $or: [{ email: login }, { username: login }] 
+    });
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign({ id: user._id }, config.jwtSecret, { expiresIn: '1d' });
+
+    res.status(200).json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to login' });
+  }
+});
 
 // Post an image
 app.post('/images', async (req: Request, res: Response) => {
