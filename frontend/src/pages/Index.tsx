@@ -3,9 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/SearchInput";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, LogOut, User as UserIcon, LayoutGrid, Settings } from "lucide-react";
 import { Theme } from "@/types/theme";
 import { useImageProxy } from "@/hooks/useImageProxy";
+import { AuthModal } from "@/components/AuthModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const GameCard = ({ game, onClick }: { game: Theme; onClick: () => void }) => {
   const { displayUrl } = useImageProxy(game.imageUrl || "");
@@ -40,8 +49,14 @@ const Index = () => {
   const [games, setGames] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<{ username: string } | null>(null);
 
   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
     const fetchGames = async () => {
       try {
         const response = await fetch("http://localhost:5000/");
@@ -49,8 +64,6 @@ const Index = () => {
           throw new Error("Failed to fetch themes");
         }
         const data = await response.json() as (Theme & { _id: string })[];
-        // Backend uses _id, but frontend types might expect id. 
-        // Mapping _id to id for consistency if needed, but keeping both for now.
         const mappedData = data.map((game) => ({
           ...game,
           id: game._id || game.id
@@ -67,6 +80,13 @@ const Index = () => {
     fetchGames();
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    window.location.reload();
+  };
+
   const filteredGames = games.filter((game) =>
     game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     game.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -75,6 +95,41 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-6xl mx-auto">
+        <div className="flex justify-end mb-4">
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2 hover:bg-accent">
+                  <UserIcon className="w-4 h-4" />
+                  <span className="font-medium">{user.username}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/my-themes")}>
+                  <LayoutGrid className="w-4 h-4 mr-2" />
+                  My Themes
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={handleLogout} 
+                  className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <AuthModal />
+          )}
+        </div>
+        
         <header className="mb-12 text-center">
           <h1 className="text-5xl font-extrabold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
             De Zero a Dez
