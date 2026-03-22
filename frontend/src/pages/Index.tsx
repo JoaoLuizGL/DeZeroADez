@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/context/AuthContext";
 
 const GameCard = ({ game, onClick }: { game: Theme; onClick: () => void }) => {
   const { displayUrl } = useImageProxy(game.imageUrl || "");
@@ -45,18 +46,14 @@ const GameCard = ({ game, onClick }: { game: Theme; onClick: () => void }) => {
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout, openAuthModal } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [games, setGames] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [intendedDestination, setIntendedDestination] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-
     const fetchGames = async () => {
       try {
         const response = await fetch("http://localhost:5000/");
@@ -80,11 +77,29 @@ const Index = () => {
     fetchGames();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
-    window.location.reload();
+  useEffect(() => {
+    if (isAuthenticated && intendedDestination) {
+      navigate(intendedDestination);
+      setIntendedDestination(null);
+    }
+  }, [isAuthenticated, intendedDestination, navigate]);
+
+  const handleGameClick = (id: string) => {
+    if (!isAuthenticated) {
+      setIntendedDestination(`/game/${id}`);
+      openAuthModal();
+    } else {
+      navigate(`/game/${id}`);
+    }
+  };
+
+  const handleCreateGameClick = () => {
+    if (!isAuthenticated) {
+      setIntendedDestination("/create-game");
+      openAuthModal();
+    } else {
+      navigate("/create-game");
+    }
   };
 
   const filteredGames = games.filter((game) =>
@@ -117,7 +132,7 @@ const Index = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
-                  onClick={handleLogout} 
+                  onClick={logout} 
                   className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
@@ -126,7 +141,7 @@ const Index = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <AuthModal />
+            <AuthModal trigger={<Button variant="outline">Login / Sign Up</Button>} />
           )}
         </div>
         
@@ -159,7 +174,7 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card 
               className="group h-[280px] bg-primary text-primary-foreground hover:scale-[1.02] transition-all duration-300 cursor-pointer flex flex-col items-center justify-center p-6 text-center border-none shadow-lg hover:shadow-primary/20"
-              onClick={() => navigate("/create-game")}
+              onClick={handleCreateGameClick}
             >
               <div className="mb-4 p-4 rounded-full bg-primary-foreground/10 text-primary-foreground group-hover:scale-110 transition-transform duration-200">
                 <Plus className="w-10 h-10" />
@@ -172,7 +187,7 @@ const Index = () => {
               <GameCard 
                 key={game.id} 
                 game={game} 
-                onClick={() => navigate(`/game/${game.id}`)} 
+                onClick={() => handleGameClick(game.id)} 
               />
             ))}
             

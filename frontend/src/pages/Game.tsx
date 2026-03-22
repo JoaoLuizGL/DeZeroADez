@@ -5,6 +5,8 @@ import ItemList from "@/components/game/ItemList";
 import RatingBoard from "@/components/game/RatingBoard";
 import { Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
+import { AuthModal } from "@/components/AuthModal";
 
 const SLOT_LIMITS: Record<number, number> = {
   0: 3, 1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3, 7: 3, 8: 3, 9: 3, 10: 3,
@@ -13,6 +15,7 @@ const SLOT_LIMITS: Record<number, number> = {
 const GamePage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated, openAuthModal, isAuthModalOpen } = useAuth();
   
   const [currentGame, setCurrentGame] = useState<Theme | null>(null);
   const [availableItems, setAvailableItems] = useState<ThemeItem[]>([]);
@@ -20,6 +23,12 @@ const GamePage = () => {
   const [placedItems, setPlacedItems] = useState<PlacedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isAuthenticated && !isAuthModalOpen) {
+      openAuthModal();
+    }
+  }, [isAuthenticated, openAuthModal, isAuthModalOpen]);
 
   useEffect(() => {
     const fetchGame = async () => {
@@ -152,6 +161,7 @@ const GamePage = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
+      <AuthModal />
       {/* Sidebar */}
       <div className="w-56 flex-shrink-0">
         <ItemList

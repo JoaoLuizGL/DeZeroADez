@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, X, Upload, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,12 @@ import {
 import BackButton from "@/components/BackButton";
 import { ThemeItem } from "@/types/theme";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
+import { AuthModal } from "@/components/AuthModal";
 
 const CreateGame = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, openAuthModal, isAuthModalOpen } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const themeImageInputRef = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<ThemeItem[]>([]);
@@ -29,7 +32,14 @@ const CreateGame = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const MAX_ITEMS = 29;
 
+  useEffect(() => {
+    if (!isAuthenticated && !isAuthModalOpen) {
+      openAuthModal();
+    }
+  }, [isAuthenticated, openAuthModal, isAuthModalOpen]);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+// ... (rest of the file stays similar, just adding AuthModal at the end)
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -186,6 +196,7 @@ const CreateGame = () => {
 
   return (
     <div className="min-h-screen bg-background p-8">
+      <AuthModal />
       {/* Dialog placed outside the main form to prevent nested form submission issues */}
       <Dialog open={isDialogOpen} onOpenChange={(open) => {
         setIsDialogOpen(open);

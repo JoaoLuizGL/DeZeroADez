@@ -18,18 +18,23 @@ import {
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
-export function AuthModal() {
+interface AuthModalProps {
+  trigger?: React.ReactNode;
+}
+
+export function AuthModal({ trigger }: AuthModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
+  const { isAuthModalOpen, openAuthModal, closeAuthModal, login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const login = formData.get("login");
+    const loginValue = formData.get("login");
     const password = formData.get("password");
 
     try {
@@ -38,7 +43,7 @@ export function AuthModal() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ login, password }),
+        body: JSON.stringify({ login: loginValue, password }),
       });
 
       const data = await response.json();
@@ -47,15 +52,12 @@ export function AuthModal() {
         throw new Error(data.error || "Failed to login");
       }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      login(data.user, data.token);
       
       toast({
         title: "Success",
         description: "Logged in successfully!",
       });
-      setOpen(false);
-      window.location.reload(); // Refresh to update UI with auth state
     } catch (error: any) {
       toast({
         title: "Error",
@@ -91,15 +93,12 @@ export function AuthModal() {
         throw new Error(data.error || "Failed to signup");
       }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      login(data.user, data.token);
 
       toast({
         title: "Success",
         description: "Account created successfully!",
       });
-      setOpen(false);
-      window.location.reload();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -112,10 +111,12 @@ export function AuthModal() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Login / Signup</Button>
-      </DialogTrigger>
+    <Dialog open={isAuthModalOpen} onOpenChange={(open) => open ? openAuthModal() : closeAuthModal()}>
+      {trigger && (
+        <DialogTrigger asChild>
+          {trigger}
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Account</DialogTitle>
