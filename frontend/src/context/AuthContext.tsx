@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface User {
+  id: string;
   username: string;
   email: string;
 }
@@ -12,6 +13,7 @@ interface AuthContextType {
   closeAuthModal: () => void;
   login: (user: User, token: string) => void;
   logout: () => void;
+  updateUser: (user: User) => void;
   isAuthModalOpen: boolean;
 }
 
@@ -49,6 +51,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const updateUser = (updatedUser: User) => {
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  };
+
   const isAuthenticated = !!user;
 
   return (
@@ -60,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         closeAuthModal,
         login,
         logout,
+        updateUser,
         isAuthModalOpen,
       }}
     >

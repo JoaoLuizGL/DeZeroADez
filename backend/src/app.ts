@@ -15,6 +15,29 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// Authentication Middleware
+const authenticate = async (req: Request, res: Response, next: any) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Unauthorized: No token provided' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded: any = jwt.verify(token, config.jwtSecret);
+    
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized: User not found' });
+    }
+
+    (req as any).user = user;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Unauthorized: Invalid token' });
+  }
+};
+
 // Auth Routes
 app.post('/signup', async (req: Request, res: Response) => {
   try {
@@ -80,6 +103,46 @@ app.post('/login', async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to login' });
+  }
+});
+
+// User Routes
+app.patch('/users/:id', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { username, email, password } = req.body;
+
+    // Ensure user is updating their own profile
+    if ((req as any).user._id.toString() !== id) {
+      return res.status(403).json({ error: 'Forbidden: You can only update your own profile' });
+    }
+
+    const user: any = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (password) {
+      user.password = password; // The pre-save hook will hash this
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: 'User updated successfully',
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (error: any) {
+    if (error.code === 11000) {
+      return res.status(409).json({ error: 'Username or email already exists' });
+    }
+    res.status(500).json({ error: 'Failed to update user' });
   }
 });
 

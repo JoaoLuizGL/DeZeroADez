@@ -7,6 +7,7 @@ import { Plus, Loader2, LogOut, User as UserIcon, LayoutGrid, Settings } from "l
 import { Theme } from "@/types/theme";
 import { useImageProxy } from "@/hooks/useImageProxy";
 import { AuthModal } from "@/components/AuthModal";
+import { ProfileModal } from "@/components/ProfileModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,6 +53,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [intendedDestination, setIntendedDestination] = useState<string | null>(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -122,7 +124,7 @@ const Index = () => {
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                <DropdownMenuItem onClick={() => setIsProfileModalOpen(true)}>
                   <Settings className="w-4 h-4 mr-2" />
                   Profile
                 </DropdownMenuItem>
@@ -144,6 +146,11 @@ const Index = () => {
             <AuthModal trigger={<Button variant="outline">Login / Sign Up</Button>} />
           )}
         </div>
+        
+        <ProfileModal 
+          open={isProfileModalOpen} 
+          onOpenChange={setIsProfileModalOpen} 
+        />
         
         <header className="mb-12 text-center">
           <h1 className="text-5xl font-extrabold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
