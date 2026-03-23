@@ -176,6 +176,7 @@ const GamePage = () => {
       {/* Main board */}
       <RatingBoard
         gameName={currentGame.name}
+        creator={currentGame.creator}
         placedItems={placedItems}
         selectedItemId={selectedItemId}
         availableItemsCount={availableItems.length}

@@ -3,6 +3,7 @@ import NumberSlot from "./NumberSlot";
 
 interface RatingBoardProps {
   gameName: string;
+  creator?: string;
   placedItems: PlacedItem[];
   selectedItemId: string | null;
   availableItemsCount: number;
@@ -27,6 +28,7 @@ const RATING_CONFIG: { rating: number; slots: number }[] = [
 
 const RatingBoard = ({
   gameName,
+  creator,
   placedItems,
   selectedItemId,
   availableItemsCount,
@@ -39,15 +41,20 @@ const RatingBoard = ({
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       <div className="p-3 border-b border-border flex items-center justify-between">
         <div className="flex-1">
-          <h2 className="font-display text-2xl text-primary tracking-wide whitespace-nowrap">
-            DE ZERO A DEZ
+          <h2 className="font-display text-2xl text-primary tracking-wide whitespace-nowrap uppercase italic">
+            DE SOLA A DEZ
           </h2>
         </div>
         
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 text-center">
           <h3 className="font-display text-lg tracking-wide whitespace-nowrap">
             {gameName}
           </h3>
+          {creator && (
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] -mt-1">
+              {creator === "Original" ? "Original" : `BY ${creator}`}
+            </p>
+          )}
         </div>
 
         <div className="flex-1 flex justify-end">

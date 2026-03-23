@@ -32,6 +32,15 @@ const GameCard = ({ game, onClick }: { game: Theme; onClick: () => void }) => {
       }}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 group-hover:from-black transition-opacity duration-300" />
+      
+      {game.creator && (
+        <div className="absolute top-3 right-3 z-20">
+          <span className="text-[10px] font-bold bg-primary/80 text-primary-foreground px-2 py-0.5 rounded uppercase tracking-wider backdrop-blur-sm">
+            {game.creator === "Original" ? "Original" : `BY ${game.creator}`}
+          </span>
+        </div>
+      )}
+
       <CardHeader className="relative z-10 text-white p-5">
         <CardTitle className="text-xl mb-1 group-hover:text-primary transition-colors">{game.name}</CardTitle>
         <CardDescription className="line-clamp-2 text-white/80 text-sm leading-relaxed">{game.description}</CardDescription>
