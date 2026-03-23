@@ -21,7 +21,7 @@ import { AuthModal } from "@/components/AuthModal";
 
 const CreateGame = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, openAuthModal, isAuthModalOpen } = useAuth();
+  const { user, isAuthenticated, openAuthModal, isAuthModalOpen } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const themeImageInputRef = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<ThemeItem[]>([]);
@@ -39,7 +39,7 @@ const CreateGame = () => {
   }, [isAuthenticated, openAuthModal, isAuthModalOpen]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-// ... (rest of the file stays similar, just adding AuthModal at the end)
+// ... (rest of the handleImageChange logic)
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -123,7 +123,7 @@ const CreateGame = () => {
       return;
     }
 
-    console.log("Submitting new game with data:", JSON.stringify({ name, description, items }));
+    console.log("Submitting new game with data:", JSON.stringify({ name, description, items, creator: user?.username }));
 
     setIsSaving(true);
     try {
@@ -175,6 +175,7 @@ const CreateGame = () => {
           name,
           description,
           imageUrl: finalThemeImageUrl,
+          creator: user?.username || "Original",
           items: processedItems,
         }),
       });
