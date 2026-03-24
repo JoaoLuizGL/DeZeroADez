@@ -7,6 +7,7 @@ import { AuthProvider } from "./context/AuthContext";
 import Index from "./pages/Index";
 import Game from "./pages/Game";
 import CreateGame from "./pages/CreateGame";
+import MyThemes from "./pages/MyThemes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/game/:id" element={<Game />} />
             <Route path="/create-game" element={<CreateGame />} />
+            <Route path="/my-themes" element={<MyThemes />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -166,16 +166,17 @@ const CreateGame = () => {
       }));
 
       // 3. Create the theme with processed item image URLs
+      const token = localStorage.getItem("token");
       const response = await fetch("http://localhost:5000/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
           name,
           description,
           imageUrl: finalThemeImageUrl,
-          creator: user?.username || "Original",
           items: processedItems,
         }),
       });

@@ -193,9 +193,10 @@ app.get('/', async (req: Request, res: Response) => {
 });
 
 // Create a new theme
-app.post('/', async (req: Request, res: Response) => {
+app.post('/', authenticate, async (req: Request, res: Response) => {
   try {
-    const { name, description, imageUrl, items, creator } = req.body;
+    const { name, description, imageUrl, items } = req.body;
+    const user = (req as any).user;
 
     if (!name || !description || !items || !Array.isArray(items)) {
       return res.status(400).json({ error: 'Missing required fields: name, description, and items (array)' });
@@ -206,13 +207,24 @@ app.post('/', async (req: Request, res: Response) => {
       description,
       imageUrl,
       items,
-      creator: creator || 'Original',
+      creator: user.username,
     });
 
     const savedTheme = await newTheme.save();
     res.status(201).json(savedTheme);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create theme' });
+  }
+});
+
+// Get themes for the logged-in user
+app.get('/themes/me', authenticate, async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const themes = await Theme.find({ creator: user.username });
+    res.status(200).json(themes);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch your themes' });
   }
 });
 
