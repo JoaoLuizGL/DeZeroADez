@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
 
-const ThemeCard = ({ theme, onClick }: { theme: Theme; onClick: () => void }) => {
+const ThemeCard = ({ theme, onClick, onEdit }: { theme: Theme; onClick: () => void; onEdit: (e: React.MouseEvent) => void }) => {
   const { displayUrl } = useImageProxy(theme.imageUrl || "");
   
   return (
@@ -33,13 +33,21 @@ const ThemeCard = ({ theme, onClick }: { theme: Theme; onClick: () => void }) =>
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 group-hover:from-black transition-opacity duration-300" />
       
-      {theme.creator && (
-        <div className="absolute top-3 right-3 z-20">
-          <span className="text-[10px] font-bold bg-primary/80 text-primary-foreground px-2 py-0.5 rounded uppercase tracking-wider backdrop-blur-sm">
+      <div className="absolute top-3 right-3 z-20 flex gap-2">
+        <Button 
+          variant="secondary" 
+          size="icon" 
+          className="h-8 w-8 bg-black/50 border-none text-white hover:bg-primary hover:text-primary-foreground backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300"
+          onClick={onEdit}
+        >
+          <Settings className="w-4 h-4" />
+        </Button>
+        {theme.creator && (
+          <span className="text-[10px] font-bold bg-primary/80 text-primary-foreground px-2 py-0.5 rounded uppercase tracking-wider backdrop-blur-sm flex items-center">
             {theme.creator === "Original" ? "Original" : `BY ${theme.creator}`}
           </span>
-        </div>
-      )}
+        )}
+      </div>
 
       <CardHeader className="relative z-10 text-white p-5">
         <CardTitle className="text-xl mb-1 group-hover:text-primary transition-colors">{theme.name}</CardTitle>
@@ -196,6 +204,10 @@ const MyThemes = () => {
                 key={theme.id} 
                 theme={theme} 
                 onClick={() => handleThemeClick(theme.id)} 
+                onEdit={(e) => {
+                  e.stopPropagation();
+                  navigate(`/create-theme?id=${theme.id}`);
+                }}
               />
             ))}
             

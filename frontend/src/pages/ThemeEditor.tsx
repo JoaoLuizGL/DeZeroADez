@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Plus, X, Upload, Image as ImageIcon } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Plus, X, Upload, Image as ImageIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,27 +19,91 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { AuthModal } from "@/components/AuthModal";
 
-const CreateTheme = () => {
+const ThemeEditor = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const themeId = searchParams.get("id");
+  const isEditing = !!themeId;
+
   const { user, isAuthenticated, openAuthModal, isAuthModalOpen } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const themeImageInputRef = useRef<HTMLInputElement>(null);
+  
+  const [themeName, setThemeName] = useState("");
+  const [themeDescription, setThemeDescription] = useState("");
   const [items, setItems] = useState<ThemeItem[]>([]);
   const [newItemName, setNewItemName] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [themeImagePreview, setThemeImagePreview] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<ThemeItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(isEditing);
+  const [isSaving, setIsSaving] = useState(false);
+
   const MAX_ITEMS = 29;
 
+  // Fetch theme data if editing
   useEffect(() => {
-    if (!isAuthenticated && !isAuthModalOpen) {
+    const fetchTheme = async () => {
+      if (!themeId) return;
+
+      try {
+        const response = await fetch(`http://localhost:5000/${themeId}`);
+        if (!response.ok) throw new Error("Failed to fetch theme");
+        
+        const theme = await response.json();
+        setThemeName(theme.name);
+        setThemeDescription(theme.description);
+        
+        // Fetch theme image if it's an ID
+        if (theme.imageUrl && /^[0-9a-fA-F]{24}$/.test(theme.imageUrl)) {
+          const imgRes = await fetch(`http://localhost:5000/images/${theme.imageUrl}`);
+          if (imgRes.ok) {
+            const imgData = await imgRes.json();
+            setThemeImagePreview(imgData.data);
+          }
+        } else {
+          setThemeImagePreview(theme.imageUrl);
+        }
+
+        // Fetch items images if they are IDs
+        const processedItems = await Promise.all((theme.items || []).map(async (item: any) => {
+          if (item.imageUrl && /^[0-9a-fA-F]{24}$/.test(item.imageUrl)) {
+            try {
+              const imgRes = await fetch(`http://localhost:5000/images/${item.imageUrl}`);
+              if (imgRes.ok) {
+                const imgData = await imgRes.json();
+                return { ...item, imageUrl: imgData.data };
+              }
+            } catch (err) {
+              console.error(`Error fetching image for item ${item.id}:`, err);
+            }
+          }
+          return item;
+        }));
+        
+        setItems(processedItems);
+      } catch (err) {
+        console.error("Error fetching theme:", err);
+        alert("Failed to load theme for editing.");
+        navigate("/my-themes");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isEditing) {
+      fetchTheme();
+    }
+  }, [themeId, isEditing, navigate]);
+
+  useEffect(() => {
+    if (!isAuthenticated && !isAuthModalOpen && !isLoading) {
       openAuthModal();
     }
-  }, [isAuthenticated, openAuthModal, isAuthModalOpen]);
+  }, [isAuthenticated, openAuthModal, isAuthModalOpen, isLoading]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-// ... (rest of the handleImageChange logic)
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -109,21 +173,13 @@ const CreateTheme = () => {
     setItems(items.filter(item => item.id !== id));
   };
 
-  const [isSaving, setIsSaving] = useState(false);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const form = e.target as HTMLFormElement;
-    const name = (form.elements.namedItem("name") as HTMLInputElement).value;
-    const description = (form.elements.namedItem("description") as HTMLTextAreaElement).value;
-
     if (items.length === 0) {
       alert("Please add at least one item to the theme.");
       return;
     }
-
-    console.log("Submitting new theme with data:", JSON.stringify({ name, description, items, creator: user?.username }));
 
     setIsSaving(true);
     try {
@@ -159,42 +215,55 @@ const CreateTheme = () => {
           }
           
           const imgData = await imgResponse.json();
-          // Replace base64 with the image ID or a URL path
+          // Replace base64 with the image ID
           return { ...item, imageUrl: imgData.id };
         }
         return item;
       }));
 
-      // 3. Create the theme with processed item image URLs
+      // 3. Save the theme
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/", {
-        method: "POST",
+      const url = isEditing ? `http://localhost:5000/${themeId}` : "http://localhost:5000/";
+      const method = isEditing ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
-          name,
-          description,
+          name: themeName,
+          description: themeDescription,
           imageUrl: finalThemeImageUrl,
           items: processedItems,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save the theme");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to save the theme");
       }
 
       const savedTheme = await response.json();
-      console.log("Saved new theme:", savedTheme);
-      navigate("/");
-    } catch (err) {
+      console.log("Saved theme:", savedTheme);
+      navigate(isEditing ? `/theme/${themeId}` : "/");
+    } catch (err: any) {
       console.error("Error saving theme:", err);
-      alert("Failed to save the theme. Please try again.");
+      alert(err.message || "Failed to save the theme. Please try again.");
     } finally {
       setIsSaving(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+        <p className="text-muted-foreground animate-pulse">Loading theme details...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -276,23 +345,38 @@ const CreateTheme = () => {
       <div className="max-w-2xl mx-auto">
         <BackButton />
         <header className="mb-12 text-center">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Create New Theme</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">
+            {isEditing ? "Edit Theme" : "Create New Theme"}
+          </h1>
           <p className="text-xl text-muted-foreground">
-            Define your theme and items to start rating.
+            {isEditing 
+              ? "Update your theme details and items." 
+              : "Define your theme and items to start rating."}
           </p>
         </header>
 
         <Card>
           <CardHeader>
             <CardTitle>Theme Details</CardTitle>
-            <CardDescription>Enter the basic information for your new rating theme.</CardDescription>
+            <CardDescription>
+              {isEditing 
+                ? "Update the basic information for your theme." 
+                : "Enter the basic information for your new rating theme."}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="name">Theme Name</Label>
-                  <Input id="name" placeholder="e.g., Best Programming Languages" required name="name" />
+                  <Input 
+                    id="name" 
+                    placeholder="e.g., Best Programming Languages" 
+                    required 
+                    name="name" 
+                    value={themeName}
+                    onChange={(e) => setThemeName(e.target.value)}
+                  />
                 </div>
                 
                 <div className="space-y-2">
@@ -333,6 +417,8 @@ const CreateTheme = () => {
                   placeholder="Describe what people will be rating..." 
                   className="min-h-[100px]"
                   required
+                  value={themeDescription}
+                  onChange={(e) => setThemeDescription(e.target.value)}
                 />
               </div>
 
@@ -397,7 +483,7 @@ const CreateTheme = () => {
               </div>
 
               <div className="flex gap-4 pt-4">
-                <Button type="button" variant="outline" className="flex-1" onClick={() => navigate("/")} disabled={isSaving}>
+                <Button type="button" variant="outline" className="flex-1" onClick={() => navigate(-1)} disabled={isSaving}>
                   Cancel
                 </Button>
                 <Button 
@@ -406,7 +492,9 @@ const CreateTheme = () => {
                   className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
                   disabled={items.length === 0 || isSaving}
                 >
-                  {isSaving ? "Creating..." : "Create Theme"}
+                  {isSaving 
+                    ? (isEditing ? "Updating..." : "Creating...") 
+                    : (isEditing ? "Update Theme" : "Create Theme")}
                 </Button>
               </div>
             </form>
@@ -417,4 +505,4 @@ const CreateTheme = () => {
   );
 };
 
-export default CreateTheme;
+export default ThemeEditor;
