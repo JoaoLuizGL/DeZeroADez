@@ -2,7 +2,7 @@ import { PlacedItem } from "@/types/theme";
 import NumberSlot from "./NumberSlot";
 
 interface RatingBoardProps {
-  gameName: string;
+  themeName: string;
   creator?: string;
   placedItems: PlacedItem[];
   selectedItemId: string | null;
@@ -27,7 +27,7 @@ const RATING_CONFIG: { rating: number; slots: number }[] = [
 ];
 
 const RatingBoard = ({
-  gameName,
+  themeName,
   creator,
   placedItems,
   selectedItemId,
@@ -48,7 +48,7 @@ const RatingBoard = ({
         
         <div className="flex-shrink-0 text-center">
           <h3 className="font-display text-lg tracking-wide whitespace-nowrap">
-            {gameName}
+            {themeName}
           </h3>
           {creator && (
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] -mt-1">

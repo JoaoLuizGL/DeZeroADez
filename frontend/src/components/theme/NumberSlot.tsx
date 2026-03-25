@@ -74,7 +74,7 @@ const NumberSlot = ({
         <div
           onClick={() => {
             if (placed) {
-              // Toggle selection: if already selected, deselect (onSelectItem(id) in Game.tsx handles toggle)
+              // Toggle selection: if already selected, deselect (onSelectItem(id) in Theme.tsx handles toggle)
               onSelectItem(placed.id);
             } else if (canReceive) {
               onPlaceItem(rating, idx);

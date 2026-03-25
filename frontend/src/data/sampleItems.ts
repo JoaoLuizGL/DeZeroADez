@@ -106,7 +106,7 @@ const programmingLanguages: ThemeItem[] = [
   }
 ];
 
-export const sampleGames: Theme[] = [
+export const sampleThemes: Theme[] = [
   {
     id: "1",
     name: "Top 10 Football Players",

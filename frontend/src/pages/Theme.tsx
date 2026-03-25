@@ -1,8 +1,8 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ThemeItem, PlacedItem, Theme } from "@/types/theme";
-import ItemList from "@/components/game/ItemList";
-import RatingBoard from "@/components/game/RatingBoard";
+import ItemList from "@/components/theme/ItemList";
+import RatingBoard from "@/components/theme/RatingBoard";
 import { Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
@@ -12,12 +12,12 @@ const SLOT_LIMITS: Record<number, number> = {
   0: 3, 1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3, 7: 3, 8: 3, 9: 3, 10: 3,
 };
 
-const GamePage = () => {
+const ThemePage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated, openAuthModal, isAuthModalOpen } = useAuth();
   
-  const [currentGame, setCurrentGame] = useState<Theme | null>(null);
+  const [currentTheme, setCurrentTheme] = useState<Theme | null>(null);
   const [availableItems, setAvailableItems] = useState<ThemeItem[]>([]);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [placedItems, setPlacedItems] = useState<PlacedItem[]>([]);
@@ -31,7 +31,7 @@ const GamePage = () => {
   }, [isAuthenticated, openAuthModal, isAuthModalOpen]);
 
   useEffect(() => {
-    const fetchGame = async () => {
+    const fetchTheme = async () => {
       if (!id) return;
       
       setLoading(true);
@@ -41,26 +41,26 @@ const GamePage = () => {
         const response = await fetch(`http://localhost:5000/${id}`);
         if (!response.ok) {
           if (response.status === 404) {
-            throw new Error("Game not found");
+            throw new Error("Theme not found");
           }
-          throw new Error("Failed to fetch game");
+          throw new Error("Failed to fetch Theme");
         }
         const data = await response.json() as Theme & { _id: string };
-        const mappedGame = {
+        const mappedTheme = {
           ...data,
           id: data._id || data.id
         };
-        setCurrentGame(mappedGame);
-        setAvailableItems(mappedGame.items);
+        setCurrentTheme(mappedTheme);
+        setAvailableItems(mappedTheme.items);
       } catch (err) {
-        console.error("Error fetching game:", err);
-        setError(err instanceof Error ? err.message : "Could not load the game.");
+        console.error("Error fetching Theme:", err);
+        setError(err instanceof Error ? err.message : "Could not load the Theme.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchGame();
+    fetchTheme();
   }, [id]);
 
   const handleSelectItem = useCallback((id: string) => {
@@ -143,12 +143,12 @@ const GamePage = () => {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-background">
         <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
-        <p className="text-xl text-muted-foreground">Loading game...</p>
+        <p className="text-xl text-muted-foreground">Loading Theme...</p>
       </div>
     );
   }
 
-  if (error || !currentGame) {
+  if (error || !currentTheme) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-background p-4 text-center">
         <AlertCircle className="w-16 h-16 text-destructive mb-4" />
@@ -175,8 +175,8 @@ const GamePage = () => {
 
       {/* Main board */}
       <RatingBoard
-        gameName={currentGame.name}
-        creator={currentGame.creator}
+        themeName={currentTheme.name}
+        creator={currentTheme.creator}
         placedItems={placedItems}
         selectedItemId={selectedItemId}
         availableItemsCount={availableItems.length}
@@ -188,4 +188,4 @@ const GamePage = () => {
   );
 };
 
-export default GamePage;
+export default ThemePage;

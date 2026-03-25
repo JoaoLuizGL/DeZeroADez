@@ -5,8 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import Index from "./pages/Index";
-import Game from "./pages/Game";
-import CreateGame from "./pages/CreateGame";
+import Theme from "./pages/Theme";
+import ThemeEditor from "./pages/ThemeEditor";
 import MyThemes from "./pages/MyThemes";
 import NotFound from "./pages/NotFound";
 
@@ -21,8 +21,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/game/:id" element={<Game />} />
-            <Route path="/create-game" element={<CreateGame />} />
+            <Route path="/theme/:id" element={<Theme />} />
+            <Route path="/create-theme" element={<ThemeEditor />} />
             <Route path="/my-themes" element={<MyThemes />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

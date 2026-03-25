@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { AuthModal } from "@/components/AuthModal";
 
-const CreateGame = () => {
+const CreateTheme = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, openAuthModal, isAuthModalOpen } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -119,11 +119,11 @@ const CreateGame = () => {
     const description = (form.elements.namedItem("description") as HTMLTextAreaElement).value;
 
     if (items.length === 0) {
-      alert("Please add at least one item to the game.");
+      alert("Please add at least one item to the theme.");
       return;
     }
 
-    console.log("Submitting new game with data:", JSON.stringify({ name, description, items, creator: user?.username }));
+    console.log("Submitting new theme with data:", JSON.stringify({ name, description, items, creator: user?.username }));
 
     setIsSaving(true);
     try {
@@ -182,15 +182,15 @@ const CreateGame = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save the game");
+        throw new Error("Failed to save the theme");
       }
 
-      const savedGame = await response.json();
-      console.log("Saved new game:", savedGame);
+      const savedTheme = await response.json();
+      console.log("Saved new theme:", savedTheme);
       navigate("/");
     } catch (err) {
-      console.error("Error saving game:", err);
-      alert("Failed to save the game. Please try again.");
+      console.error("Error saving theme:", err);
+      alert("Failed to save the theme. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -276,7 +276,7 @@ const CreateGame = () => {
       <div className="max-w-2xl mx-auto">
         <BackButton />
         <header className="mb-12 text-center">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Create New Game</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">Create New Theme</h1>
           <p className="text-xl text-muted-foreground">
             Define your theme and items to start rating.
           </p>
@@ -284,14 +284,14 @@ const CreateGame = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Game Details</CardTitle>
-            <CardDescription>Enter the basic information for your new rating game.</CardDescription>
+            <CardTitle>Theme Details</CardTitle>
+            <CardDescription>Enter the basic information for your new rating theme.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="name">Game Name</Label>
+                  <Label htmlFor="name">Theme Name</Label>
                   <Input id="name" placeholder="e.g., Best Programming Languages" required name="name" />
                 </div>
                 
@@ -339,7 +339,7 @@ const CreateGame = () => {
               {/* Items Section */}
               <div className="space-y-4 pt-6 border-t">
                 <div className="flex items-center justify-between">
-                  <Label className="text-lg font-semibold">Game Items</Label>
+                  <Label className="text-lg font-semibold">Theme Items</Label>
                   <span className={cn(
                     "text-sm font-medium transition-colors",
                     items.length >= MAX_ITEMS ? "text-destructive" : "text-muted-foreground"
@@ -406,7 +406,7 @@ const CreateGame = () => {
                   className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
                   disabled={items.length === 0 || isSaving}
                 >
-                  {isSaving ? "Creating..." : "Create Game"}
+                  {isSaving ? "Creating..." : "Create Theme"}
                 </Button>
               </div>
             </form>
@@ -417,4 +417,4 @@ const CreateGame = () => {
   );
 };
 
-export default CreateGame;
+export default CreateTheme;

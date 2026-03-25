@@ -18,8 +18,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
 
-const GameCard = ({ game, onClick }: { game: Theme; onClick: () => void }) => {
-  const { displayUrl } = useImageProxy(game.imageUrl || "");
+const ThemeCard = ({ theme, onClick }: { theme: Theme; onClick: () => void }) => {
+  const { displayUrl } = useImageProxy(theme.imageUrl || "");
   
   return (
     <Card 
@@ -33,17 +33,17 @@ const GameCard = ({ game, onClick }: { game: Theme; onClick: () => void }) => {
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 group-hover:from-black transition-opacity duration-300" />
       
-      {game.creator && (
+      {theme.creator && (
         <div className="absolute top-3 right-3 z-20">
           <span className="text-[10px] font-bold bg-primary/80 text-primary-foreground px-2 py-0.5 rounded uppercase tracking-wider backdrop-blur-sm">
-            {game.creator === "Original" ? "Original" : `BY ${game.creator}`}
+            {theme.creator === "Original" ? "Original" : `BY ${theme.creator}`}
           </span>
         </div>
       )}
 
       <CardHeader className="relative z-10 text-white p-5">
-        <CardTitle className="text-xl mb-1 group-hover:text-primary transition-colors">{game.name}</CardTitle>
-        <CardDescription className="line-clamp-2 text-white/80 text-sm leading-relaxed">{game.description}</CardDescription>
+        <CardTitle className="text-xl mb-1 group-hover:text-primary transition-colors">{theme.name}</CardTitle>
+        <CardDescription className="line-clamp-2 text-white/80 text-sm leading-relaxed">{theme.description}</CardDescription>
       </CardHeader>
       <CardContent className="relative z-10 p-5 pt-0">
         <Button variant="secondary" className="w-full font-bold group-hover:bg-primary group-hover:text-primary-foreground transition-all">
@@ -58,34 +58,34 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, openAuthModal } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const [games, setGames] = useState<Theme[]>([]);
+  const [themes, setThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [intendedDestination, setIntendedDestination] = useState<string | null>(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
-    const fetchGames = async () => {
+    const fetchThemes = async () => {
       try {
         const response = await fetch("http://localhost:5000/");
         if (!response.ok) {
           throw new Error("Failed to fetch themes");
         }
         const data = await response.json() as (Theme & { _id: string })[];
-        const mappedData = data.map((game) => ({
-          ...game,
-          id: game._id || game.id
+        const mappedData = data.map((theme) => ({
+          ...theme,
+          id: theme._id || theme.id
         }));
-        setGames(mappedData);
+        setThemes(mappedData);
       } catch (err) {
-        console.error("Error fetching games:", err);
-        setError("Could not load games. Please try again later.");
+        console.error("Error fetching themes:", err);
+        setError("Could not load themes. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchGames();
+    fetchThemes();
   }, []);
 
   useEffect(() => {
@@ -95,27 +95,27 @@ const Index = () => {
     }
   }, [isAuthenticated, intendedDestination, navigate]);
 
-  const handleGameClick = (id: string) => {
+  const handleThemeClick = (id: string) => {
     if (!isAuthenticated) {
-      setIntendedDestination(`/game/${id}`);
+      setIntendedDestination(`/theme/${id}`);
       openAuthModal();
     } else {
-      navigate(`/game/${id}`);
+      navigate(`/theme/${id}`);
     }
   };
 
-  const handleCreateGameClick = () => {
+  const handleCreateThemeClick = () => {
     if (!isAuthenticated) {
-      setIntendedDestination("/create-game");
+      setIntendedDestination("/create-theme");
       openAuthModal();
     } else {
-      navigate("/create-game");
+      navigate("/create-theme");
     }
   };
 
-  const filteredGames = games.filter((game) =>
-    game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    game.description.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredThemes = themes.filter((theme) =>
+    theme.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    theme.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -190,24 +190,24 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card 
               className="group h-[280px] bg-primary text-primary-foreground hover:scale-[1.02] transition-all duration-300 cursor-pointer flex flex-col items-center justify-center p-6 text-center border-none shadow-lg hover:shadow-primary/20"
-              onClick={handleCreateGameClick}
+              onClick={handleCreateThemeClick}
             >
               <div className="mb-4 p-4 rounded-full bg-primary-foreground/10 text-primary-foreground group-hover:scale-110 transition-transform duration-200">
                 <Plus className="w-10 h-10" />
               </div>
-              <CardTitle className="text-2xl mb-2">Create New Game</CardTitle>
+              <CardTitle className="text-2xl mb-2">Create New Theme</CardTitle>
               <CardDescription className="text-primary-foreground/70 text-base">Start your own rating list from scratch</CardDescription>
             </Card>
 
-            {filteredGames.map((game) => (
-              <GameCard 
-                key={game.id} 
-                game={game} 
-                onClick={() => handleGameClick(game.id)} 
+            {filteredThemes.map((theme) => (
+              <ThemeCard 
+                key={theme.id} 
+                theme={theme} 
+                onClick={() => handleThemeClick(theme.id)} 
               />
             ))}
             
-            {filteredGames.length === 0 && searchQuery && (
+            {filteredThemes.length === 0 && searchQuery && (
               <div className="col-span-full text-center py-12">
                 <p className="text-muted-foreground text-lg">No themes found matching "{searchQuery}"</p>
               </div>
