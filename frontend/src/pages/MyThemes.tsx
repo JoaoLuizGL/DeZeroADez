@@ -37,16 +37,11 @@ const ThemeCard = ({ theme, onClick, onEdit }: { theme: Theme; onClick: () => vo
         <Button 
           variant="secondary" 
           size="icon" 
-          className="h-8 w-8 bg-black/50 border-none text-white hover:bg-primary hover:text-primary-foreground backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300"
+          className="h-8 w-8 bg-black/50 border-none text-white hover:bg-primary hover:text-primary-foreground backdrop-blur-sm transition-all duration-300"
           onClick={onEdit}
         >
           <Settings className="w-4 h-4" />
         </Button>
-        {theme.creator && (
-          <span className="text-[10px] font-bold bg-primary/80 text-primary-foreground px-2 py-0.5 rounded uppercase tracking-wider backdrop-blur-sm flex items-center">
-            {theme.creator === "Original" ? "Original" : `BY ${theme.creator}`}
-          </span>
-        )}
       </div>
 
       <CardHeader className="relative z-10 text-white p-5">
@@ -55,7 +50,7 @@ const ThemeCard = ({ theme, onClick, onEdit }: { theme: Theme; onClick: () => vo
       </CardHeader>
       <CardContent className="relative z-10 p-5 pt-0">
         <Button variant="secondary" className="w-full font-bold group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-          Play Now
+          Selecionar
         </Button>
       </CardContent>
     </Card>
@@ -88,7 +83,7 @@ const MyThemes = () => {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch your themes");
+          throw new Error("Falha ao buscar seus temas");
         }
         const data = await response.json() as (Theme & { _id: string })[];
         const mappedData = data.map((theme) => ({
@@ -98,7 +93,7 @@ const MyThemes = () => {
         setThemes(mappedData);
       } catch (err) {
         console.error("Error fetching my themes:", err);
-        setError("Could not load your themes. Please try again later.");
+        setError("Não foi possível carregar seus temas. Por favor, tente novamente mais tarde.");
       } finally {
         setLoading(false);
       }
@@ -132,15 +127,15 @@ const MyThemes = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setIsProfileModalOpen(true)}>
                     <Settings className="w-4 h-4 mr-2" />
-                    Profile
+                    Perfil
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/my-themes")}>
                     <LayoutGrid className="w-4 h-4 mr-2" />
-                    My Themes
+                    Meus Temas
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
@@ -148,7 +143,7 @@ const MyThemes = () => {
                     className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                    Sair
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -163,28 +158,28 @@ const MyThemes = () => {
         
         <header className="mb-12 text-center">
           <h1 className="text-5xl font-extrabold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
-            My Themes
+            Meus Temas
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Manage and play your own creations
+            Gerencie e avalie suas próprias criações
           </p>
           
           <SearchInput 
             value={searchQuery} 
             onChange={setSearchQuery} 
-            placeholder="Search your themes..." 
+            placeholder="Pesquisar seus temas..." 
           />
         </header>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
-            <p className="text-muted-foreground">Loading your themes...</p>
+            <p className="text-muted-foreground">Carregando seus temas...</p>
           </div>
         ) : error ? (
           <div className="text-center py-20">
             <p className="text-destructive text-lg mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>Retry</Button>
+            <Button onClick={() => window.location.reload()}>Tentar novamente</Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -195,8 +190,8 @@ const MyThemes = () => {
               <div className="mb-4 p-4 rounded-full bg-primary-foreground/10 text-primary-foreground group-hover:scale-110 transition-transform duration-200">
                 <Plus className="w-10 h-10" />
               </div>
-              <CardTitle className="text-2xl mb-2">Create New Theme</CardTitle>
-              <CardDescription className="text-primary-foreground/70 text-base">Start your own rating list from scratch</CardDescription>
+              <CardTitle className="text-2xl mb-2">Criar Novo Tema</CardTitle>
+              <CardDescription className="text-primary-foreground/70 text-base">Comece sua própria lista de avaliação do zero</CardDescription>
             </Card>
 
             {filteredThemes.map((theme) => (
@@ -213,14 +208,14 @@ const MyThemes = () => {
             
             {filteredThemes.length === 0 && searchQuery && (
               <div className="col-span-full text-center py-12">
-                <p className="text-muted-foreground text-lg">No themes found matching "{searchQuery}"</p>
+                <p className="text-muted-foreground text-lg">Nenhum tema encontrado correspondente a "{searchQuery}"</p>
               </div>
             )}
             
             {filteredThemes.length === 0 && !searchQuery && (
               <div className="col-span-full text-center py-12">
-                <p className="text-muted-foreground text-lg mb-4">You haven't created any themes yet.</p>
-                <Button onClick={() => navigate("/create-theme")}>Create Your First Theme</Button>
+                <p className="text-muted-foreground text-lg mb-4">Você ainda não criou nenhum tema.</p>
+                <Button onClick={() => navigate("/create-theme")}>Criar seu primeiro tema</Button>
               </div>
             )}
           </div>

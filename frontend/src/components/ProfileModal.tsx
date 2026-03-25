@@ -52,8 +52,8 @@ export function ProfileModal({ trigger, open, onOpenChange }: ProfileModalProps)
     
     if (formData.password && formData.password !== formData.confirmPassword) {
       toast({
-        title: "Error",
-        description: "Passwords do not match",
+        title: "Erro",
+        description: "As senhas não coincidem",
         variant: "destructive",
       });
       return;
@@ -79,14 +79,14 @@ export function ProfileModal({ trigger, open, onOpenChange }: ProfileModalProps)
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to update profile");
+        throw new Error(data.error || "Falha ao atualizar o perfil");
       }
 
       updateUser(data.user);
       
       toast({
-        title: "Success",
-        description: "Profile updated successfully!",
+        title: "Sucesso",
+        description: "Perfil atualizado com sucesso!",
       });
       
       if (onOpenChange) {
@@ -97,7 +97,7 @@ export function ProfileModal({ trigger, open, onOpenChange }: ProfileModalProps)
       setFormData(prev => ({ ...prev, password: "", confirmPassword: "" }));
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: "Erro",
         description: error.message,
         variant: "destructive",
       });
@@ -115,60 +115,60 @@ export function ProfileModal({ trigger, open, onOpenChange }: ProfileModalProps)
       )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogTitle>Editar Perfil</DialogTitle>
           <DialogDescription>
-            Update your account information. Leave password fields blank to keep current password.
+            Atualize as informações da sua conta. Deixe os campos de senha em branco para manter a senha atual.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">Usuário</Label>
             <Input
               id="username"
               name="username"
               value={formData.username}
               onChange={handleChange}
-              placeholder="Your username"
+              placeholder="Seu usuário"
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">E-mail</Label>
             <Input
               id="email"
               name="email"
               type="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Your email"
+              placeholder="Seu e-mail"
               required
             />
           </div>
           <div className="space-y-2 pt-2 border-t">
-            <Label htmlFor="password">New Password (optional)</Label>
+            <Label htmlFor="password">Nova Senha (opcional)</Label>
             <Input
               id="password"
               name="password"
               type="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Enter new password"
+              placeholder="Digite a nova senha"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+            <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
             <Input
               id="confirmPassword"
               name="confirmPassword"
               type="password"
               value={formData.confirmPassword}
               onChange={handleChange}
-              placeholder="Confirm new password"
+              placeholder="Confirme a nova senha"
             />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Changes
+            Salvar Alterações
           </Button>
         </form>
       </DialogContent>

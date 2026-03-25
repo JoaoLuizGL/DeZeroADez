@@ -85,7 +85,7 @@ const ThemeEditor = () => {
         setItems(processedItems);
       } catch (err) {
         console.error("Error fetching theme:", err);
-        alert("Failed to load theme for editing.");
+        alert("Falha ao carregar o tema para edição.");
         navigate("/my-themes");
       } finally {
         setIsLoading(false);
@@ -177,7 +177,7 @@ const ThemeEditor = () => {
     e.preventDefault();
     
     if (items.length === 0) {
-      alert("Please add at least one item to the theme.");
+      alert("Por favor, adicione pelo menos um item ao tema.");
       return;
     }
 
@@ -193,7 +193,7 @@ const ThemeEditor = () => {
         });
         
         if (!themeImgResponse.ok) {
-          throw new Error("Failed to upload theme image");
+          throw new Error("Falha ao enviar a imagem do tema");
         }
         
         const themeImgData = await themeImgResponse.json();
@@ -211,7 +211,7 @@ const ThemeEditor = () => {
           });
           
           if (!imgResponse.ok) {
-            throw new Error(`Failed to upload image for ${item.name}`);
+            throw new Error(`Falha ao enviar a imagem para ${item.name}`);
           }
           
           const imgData = await imgResponse.json();
@@ -242,7 +242,7 @@ const ThemeEditor = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to save the theme");
+        throw new Error(errorData.error || "Falha ao salvar o tema");
       }
 
       const savedTheme = await response.json();
@@ -250,7 +250,7 @@ const ThemeEditor = () => {
       navigate(isEditing ? `/theme/${themeId}` : "/");
     } catch (err: any) {
       console.error("Error saving theme:", err);
-      alert(err.message || "Failed to save the theme. Please try again.");
+      alert(err.message || "Falha ao salvar o tema. Por favor, tente novamente.");
     } finally {
       setIsSaving(false);
     }
@@ -260,7 +260,7 @@ const ThemeEditor = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <Loader2 className="w-12 h-12 animate-spin text-primary" />
-        <p className="text-muted-foreground animate-pulse">Loading theme details...</p>
+        <p className="text-muted-foreground animate-pulse">Carregando detalhes do tema...</p>
       </div>
     );
   }
@@ -280,7 +280,7 @@ const ThemeEditor = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {editingItem ? "Edit Item" : `Add New Item (${items.length + 1}/${MAX_ITEMS})`}
+              {editingItem ? "Editar Item" : `Adicionar Novo Item (${items.length + 1}/${MAX_ITEMS})`}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSaveItem} className="space-y-6 pt-4">
@@ -299,7 +299,7 @@ const ThemeEditor = () => {
                 ) : (
                   <>
                     <ImageIcon className="w-10 h-10 text-muted-foreground" />
-                    <span className="text-[10px] font-medium text-muted-foreground uppercase">Upload Image</span>
+                    <span className="text-[10px] font-medium text-muted-foreground uppercase">Enviar Imagem</span>
                   </>
                 )}
               </div>
@@ -311,17 +311,17 @@ const ThemeEditor = () => {
                 className="hidden" 
               />
               <p className="text-[10px] text-muted-foreground text-center">
-                Recommended: Square image (1:1)
+                Recomendado: Imagem quadrada (1:1)
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="item-name">Item Name</Label>
+              <Label htmlFor="item-name">Nome do Item</Label>
               <Input 
                 id="item-name" 
                 value={newItemName} 
                 onChange={(e) => setNewItemName(e.target.value)}
-                placeholder="e.g., TypeScript, React, etc..." 
+                placeholder="ex: TypeScript, React, etc..." 
                 autoFocus
                 maxLength={40}
               />
@@ -332,10 +332,10 @@ const ThemeEditor = () => {
                 variant="ghost" 
                 onClick={() => setIsDialogOpen(false)}
               >
-                Cancel
+                Cancelar
               </Button>
               <Button type="submit" disabled={!newItemName.trim() || (!editingItem && items.length >= MAX_ITEMS)}>
-                {editingItem ? "Save Changes" : "Add Item"}
+                {editingItem ? "Salvar Alterações" : "Adicionar Item"}
               </Button>
             </DialogFooter>
           </form>
@@ -346,32 +346,32 @@ const ThemeEditor = () => {
         <BackButton />
         <header className="mb-12 text-center">
           <h1 className="text-4xl font-bold tracking-tight mb-4">
-            {isEditing ? "Edit Theme" : "Create New Theme"}
+            {isEditing ? "Editar Tema" : "Criar Novo Tema"}
           </h1>
           <p className="text-xl text-muted-foreground">
             {isEditing 
-              ? "Update your theme details and items." 
-              : "Define your theme and items to start rating."}
+              ? "Atualize os detalhes e itens do seu tema." 
+              : "Defina seu tema e itens para começar a avaliar."}
           </p>
         </header>
 
         <Card>
           <CardHeader>
-            <CardTitle>Theme Details</CardTitle>
+            <CardTitle>Detalhes do Tema</CardTitle>
             <CardDescription>
               {isEditing 
-                ? "Update the basic information for your theme." 
-                : "Enter the basic information for your new rating theme."}
+                ? "Atualize as informações básicas do seu tema." 
+                : "Insira as informações básicas para o seu novo tema de avaliação."}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="name">Theme Name</Label>
+                  <Label htmlFor="name">Nome do Tema</Label>
                   <Input 
                     id="name" 
-                    placeholder="e.g., Best Programming Languages" 
+                    placeholder="ex: Melhores Linguagens de Programação" 
                     required 
                     name="name" 
                     value={themeName}
@@ -380,7 +380,7 @@ const ThemeEditor = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>Theme Image</Label>
+                  <Label>Imagem do Tema</Label>
                   <div 
                     onClick={() => themeImageInputRef.current?.click()}
                     className="relative w-24 h-24 rounded-md border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors cursor-pointer overflow-hidden group bg-secondary/50 flex flex-col items-center justify-center gap-1"
@@ -395,7 +395,7 @@ const ThemeEditor = () => {
                     ) : (
                       <>
                         <ImageIcon className="w-6 h-6 text-muted-foreground" />
-                        <span className="text-[8px] font-medium text-muted-foreground uppercase">Upload</span>
+                        <span className="text-[8px] font-medium text-muted-foreground uppercase">Enviar</span>
                       </>
                     )}
                   </div>
@@ -410,11 +410,11 @@ const ThemeEditor = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Descrição</Label>
                 <Textarea 
                   id="description" 
                   name="description"
-                  placeholder="Describe what people will be rating..." 
+                  placeholder="Descreva o que as pessoas estarão avaliando..." 
                   className="min-h-[100px]"
                   required
                   value={themeDescription}
@@ -425,12 +425,12 @@ const ThemeEditor = () => {
               {/* Items Section */}
               <div className="space-y-4 pt-6 border-t">
                 <div className="flex items-center justify-between">
-                  <Label className="text-lg font-semibold">Theme Items</Label>
+                  <Label className="text-lg font-semibold">Itens do Tema</Label>
                   <span className={cn(
                     "text-sm font-medium transition-colors",
                     items.length >= MAX_ITEMS ? "text-destructive" : "text-muted-foreground"
                   )}>
-                    {items.length}/{MAX_ITEMS} items added
+                    {items.length}/{MAX_ITEMS} itens adicionados
                   </span>
                 </div>
                 
@@ -449,7 +449,7 @@ const ThemeEditor = () => {
                   >
                     <Plus className="w-6 h-6 group-hover:scale-110 transition-transform" />
                     <span className="text-[10px] font-bold mt-1 uppercase tracking-wider">
-                      {items.length >= MAX_ITEMS ? "Limit Reached" : "New Item"}
+                      {items.length >= MAX_ITEMS ? "Limite Atingido" : "Novo Item"}
                     </span>
                   </button>
 
@@ -484,7 +484,7 @@ const ThemeEditor = () => {
 
               <div className="flex gap-4 pt-4">
                 <Button type="button" variant="outline" className="flex-1" onClick={() => navigate(-1)} disabled={isSaving}>
-                  Cancel
+                  Cancelar
                 </Button>
                 <Button 
                   type="submit" 
@@ -493,8 +493,8 @@ const ThemeEditor = () => {
                   disabled={items.length === 0 || isSaving}
                 >
                   {isSaving 
-                    ? (isEditing ? "Updating..." : "Creating...") 
-                    : (isEditing ? "Update Theme" : "Create Theme")}
+                    ? (isEditing ? "Atualizando..." : "Criando...") 
+                    : (isEditing ? "Atualizar Tema" : "Criar Tema")}
                 </Button>
               </div>
             </form>

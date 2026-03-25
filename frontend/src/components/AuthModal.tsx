@@ -49,18 +49,18 @@ export function AuthModal({ trigger }: AuthModalProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to login");
+        throw new Error(data.error || "Falha ao entrar");
       }
 
       login(data.user, data.token);
       
       toast({
-        title: "Success",
-        description: "Logged in successfully!",
+        title: "Sucesso",
+        description: "Login realizado com sucesso!",
       });
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: "Erro",
         description: error.message,
         variant: "destructive",
       });
@@ -90,18 +90,18 @@ export function AuthModal({ trigger }: AuthModalProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to signup");
+        throw new Error(data.error || "Falha ao cadastrar");
       }
 
       login(data.user, data.token);
 
       toast({
-        title: "Success",
-        description: "Account created successfully!",
+        title: "Sucesso",
+        description: "Conta criada com sucesso!",
       });
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: "Erro",
         description: error.message,
         variant: "destructive",
       });
@@ -119,77 +119,77 @@ export function AuthModal({ trigger }: AuthModalProps) {
       )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Account</DialogTitle>
+          <DialogTitle>Conta</DialogTitle>
           <DialogDescription>
-            Login to your account or create a new one to save your ratings.
+            Entre na sua conta ou crie uma nova para salvar suas avaliações.
           </DialogDescription>
         </DialogHeader>
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="signup">Signup</TabsTrigger>
+            <TabsTrigger value="login">Entrar</TabsTrigger>
+            <TabsTrigger value="signup">Cadastrar</TabsTrigger>
           </TabsList>
           <TabsContent value="login">
             <form onSubmit={handleLogin} className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="login">Username or Email</Label>
+                <Label htmlFor="login">Usuário ou E-mail</Label>
                 <Input
                   id="login"
                   name="login"
-                  placeholder="Enter your username or email"
+                  placeholder="Digite seu usuário ou e-mail"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Senha</Label>
                 <Input
                   id="password"
                   name="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder="Digite sua senha"
                   required
                 />
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Login
+                Entrar
               </Button>
             </form>
           </TabsContent>
           <TabsContent value="signup">
             <form onSubmit={handleSignup} className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">Usuário</Label>
                 <Input
                   id="username"
                   name="username"
-                  placeholder="Choose a username"
+                  placeholder="Escolha um usuário"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">E-mail</Label>
                 <Input
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Digite seu e-mail"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password-signup">Password</Label>
+                <Label htmlFor="password-signup">Senha</Label>
                 <Input
                   id="password-signup"
                   name="password"
                   type="password"
-                  placeholder="Choose a password"
+                  placeholder="Escolha uma senha"
                   required
                 />
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create Account
+                Criar Conta
               </Button>
             </form>
           </TabsContent>

@@ -41,9 +41,9 @@ const ThemePage = () => {
         const response = await fetch(`http://localhost:5000/${id}`);
         if (!response.ok) {
           if (response.status === 404) {
-            throw new Error("Theme not found");
+            throw new Error("Tema não encontrado");
           }
-          throw new Error("Failed to fetch Theme");
+          throw new Error("Falha ao carregar o Tema");
         }
         const data = await response.json() as Theme & { _id: string };
         const mappedTheme = {
@@ -54,7 +54,7 @@ const ThemePage = () => {
         setAvailableItems(mappedTheme.items);
       } catch (err) {
         console.error("Error fetching Theme:", err);
-        setError(err instanceof Error ? err.message : "Could not load the Theme.");
+        setError(err instanceof Error ? err.message : "Não foi possível carregar o Tema.");
       } finally {
         setLoading(false);
       }
@@ -143,7 +143,7 @@ const ThemePage = () => {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-background">
         <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
-        <p className="text-xl text-muted-foreground">Loading Theme...</p>
+        <p className="text-xl text-muted-foreground">Carregando Tema...</p>
       </div>
     );
   }
@@ -152,9 +152,9 @@ const ThemePage = () => {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-background p-4 text-center">
         <AlertCircle className="w-16 h-16 text-destructive mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Oops!</h2>
-        <p className="text-muted-foreground mb-6">{error || "Something went wrong"}</p>
-        <Button onClick={() => navigate("/")}>Back to Themes</Button>
+        <h2 className="text-2xl font-bold mb-2">Ops!</h2>
+        <p className="text-muted-foreground mb-6">{error || "Algo deu errado"}</p>
+        <Button onClick={() => navigate("/")}>Voltar para Temas</Button>
       </div>
     );
   }

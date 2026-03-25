@@ -52,7 +52,7 @@ const RatingBoard = ({
           </h3>
           {creator && (
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] -mt-1">
-              {creator === "Original" ? "Original" : `BY ${creator}`}
+              {creator === "Original" ? "Original" : `POR ${creator}`}
             </p>
           )}
         </div>

@@ -36,7 +36,7 @@ const ThemeCard = ({ theme, onClick }: { theme: Theme; onClick: () => void }) =>
       {theme.creator && (
         <div className="absolute top-3 right-3 z-20">
           <span className="text-[10px] font-bold bg-primary/80 text-primary-foreground px-2 py-0.5 rounded uppercase tracking-wider backdrop-blur-sm">
-            {theme.creator === "Original" ? "Original" : `BY ${theme.creator}`}
+            {theme.creator === "Original" ? "Original" : `POR ${theme.creator}`}
           </span>
         </div>
       )}
@@ -47,7 +47,7 @@ const ThemeCard = ({ theme, onClick }: { theme: Theme; onClick: () => void }) =>
       </CardHeader>
       <CardContent className="relative z-10 p-5 pt-0">
         <Button variant="secondary" className="w-full font-bold group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-          Play Now
+          Selecionar
         </Button>
       </CardContent>
     </Card>
@@ -69,7 +69,7 @@ const Index = () => {
       try {
         const response = await fetch("http://localhost:5000/");
         if (!response.ok) {
-          throw new Error("Failed to fetch themes");
+          throw new Error("Falha ao buscar temas");
         }
         const data = await response.json() as (Theme & { _id: string })[];
         const mappedData = data.map((theme) => ({
@@ -79,7 +79,7 @@ const Index = () => {
         setThemes(mappedData);
       } catch (err) {
         console.error("Error fetching themes:", err);
-        setError("Could not load themes. Please try again later.");
+        setError("Não foi possível carregar os temas. Por favor, tente novamente mais tarde.");
       } finally {
         setLoading(false);
       }
@@ -131,15 +131,15 @@ const Index = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setIsProfileModalOpen(true)}>
                   <Settings className="w-4 h-4 mr-2" />
-                  Profile
+                  Perfil
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/my-themes")}>
                   <LayoutGrid className="w-4 h-4 mr-2" />
-                  My Themes
+                  Meus Temas
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
@@ -147,12 +147,12 @@ const Index = () => {
                   className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
-                  Logout
+                  Sair
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <AuthModal trigger={<Button variant="outline">Login / Sign Up</Button>} />
+            <AuthModal trigger={<Button variant="outline">Entrar / Cadastrar</Button>} />
           )}
         </div>
         
@@ -166,25 +166,25 @@ const Index = () => {
             De Zero a Dez
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Select a theme and start rating!
+            Selecione um tema e comece a avaliar!
           </p>
           
           <SearchInput 
             value={searchQuery} 
             onChange={setSearchQuery} 
-            placeholder="Search themes..." 
+            placeholder="Pesquisar temas..." 
           />
         </header>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
-            <p className="text-muted-foreground">Loading themes...</p>
+            <p className="text-muted-foreground">Carregando temas...</p>
           </div>
         ) : error ? (
           <div className="text-center py-20">
             <p className="text-destructive text-lg mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>Retry</Button>
+            <Button onClick={() => window.location.reload()}>Tentar novamente</Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -195,8 +195,8 @@ const Index = () => {
               <div className="mb-4 p-4 rounded-full bg-primary-foreground/10 text-primary-foreground group-hover:scale-110 transition-transform duration-200">
                 <Plus className="w-10 h-10" />
               </div>
-              <CardTitle className="text-2xl mb-2">Create New Theme</CardTitle>
-              <CardDescription className="text-primary-foreground/70 text-base">Start your own rating list from scratch</CardDescription>
+              <CardTitle className="text-2xl mb-2">Criar Novo Tema</CardTitle>
+              <CardDescription className="text-primary-foreground/70 text-base">Comece sua própria lista de avaliação do zero</CardDescription>
             </Card>
 
             {filteredThemes.map((theme) => (
@@ -209,15 +209,15 @@ const Index = () => {
             
             {filteredThemes.length === 0 && searchQuery && (
               <div className="col-span-full text-center py-12">
-                <p className="text-muted-foreground text-lg">No themes found matching "{searchQuery}"</p>
+                <p className="text-muted-foreground text-lg">Nenhum tema encontrado correspondente a "{searchQuery}"</p>
               </div>
             )}
 
             {!searchQuery && (
               <Card className="border-dashed border-2 h-[280px] flex flex-col items-center justify-center p-6 bg-muted/20 opacity-60">
                 <CardHeader className="text-center">
-                  <CardTitle className="text-muted-foreground">More coming soon...</CardTitle>
-                  <CardDescription>Stay tuned for new themes</CardDescription>
+                  <CardTitle className="text-muted-foreground">Mais em breve...</CardTitle>
+                  <CardDescription>Fique ligado para novos temas</CardDescription>
                 </CardHeader>
               </Card>
             )}
