@@ -23,24 +23,12 @@ interface ProfileModalProps {
 export function ProfileModal({ trigger, open, onOpenChange }: ProfileModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { user, updateUser } = useAuth();
+  const { user } = useAuth();
   
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
     password: "",
     confirmPassword: "",
   });
-
-  useEffect(() => {
-    if (user) {
-      setFormData((prev) => ({
-        ...prev,
-        username: user.username,
-        email: user.email,
-      }));
-    }
-  }, [user, open]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -50,7 +38,7 @@ export function ProfileModal({ trigger, open, onOpenChange }: ProfileModalProps)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (formData.password && formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Erro",
         description: "As senhas não coincidem",
@@ -70,23 +58,19 @@ export function ProfileModal({ trigger, open, onOpenChange }: ProfileModalProps)
           "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          ...(formData.password ? { password: formData.password } : {}),
+          password: formData.password,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Falha ao atualizar o perfil");
+        throw new Error(data.error || "Falha ao atualizar a senha");
       }
 
-      updateUser(data.user);
-      
       toast({
         title: "Sucesso",
-        description: "Perfil atualizado com sucesso!",
+        description: "Senha atualizada com sucesso!",
       });
       
       if (onOpenChange) {
@@ -94,7 +78,7 @@ export function ProfileModal({ trigger, open, onOpenChange }: ProfileModalProps)
       }
       
       // Clear password fields
-      setFormData(prev => ({ ...prev, password: "", confirmPassword: "" }));
+      setFormData({ password: "", confirmPassword: "" });
     } catch (error: any) {
       toast({
         title: "Erro",
@@ -115,37 +99,14 @@ export function ProfileModal({ trigger, open, onOpenChange }: ProfileModalProps)
       )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Editar Perfil</DialogTitle>
+          <DialogTitle>Alterar Senha</DialogTitle>
           <DialogDescription>
-            Atualize as informações da sua conta. Deixe os campos de senha em branco para manter a senha atual.
+            Digite sua nova senha abaixo para atualizar sua conta.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Usuário</Label>
-            <Input
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Seu usuário"
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">E-mail</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Seu e-mail"
-              required
-            />
-          </div>
-          <div className="space-y-2 pt-2 border-t">
-            <Label htmlFor="password">Nova Senha (opcional)</Label>
+            <Label htmlFor="password">Nova Senha</Label>
             <Input
               id="password"
               name="password"
@@ -153,6 +114,7 @@ export function ProfileModal({ trigger, open, onOpenChange }: ProfileModalProps)
               value={formData.password}
               onChange={handleChange}
               placeholder="Digite a nova senha"
+              required
             />
           </div>
           <div className="space-y-2">
@@ -164,11 +126,12 @@ export function ProfileModal({ trigger, open, onOpenChange }: ProfileModalProps)
               value={formData.confirmPassword}
               onChange={handleChange}
               placeholder="Confirme a nova senha"
+              required
             />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Salvar Alterações
+            Atualizar Senha
           </Button>
         </form>
       </DialogContent>

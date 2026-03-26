@@ -41,18 +41,18 @@ const authenticate = async (req: Request, res: Response, next: any) => {
 // Auth Routes
 app.post('/signup', async (req: Request, res: Response) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, password } = req.body;
 
-    if (!username || !email || !password) {
+    if (!username || !password) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(409).json({ error: 'User already exists' });
     }
 
-    const newUser = new User({ username, email, password });
+    const newUser = new User({ username, password });
     await newUser.save();
 
     const token = jwt.sign({ id: newUser._id }, config.jwtSecret, { expiresIn: '1d' });
@@ -62,7 +62,6 @@ app.post('/signup', async (req: Request, res: Response) => {
       user: {
         id: newUser._id,
         username: newUser.username,
-        email: newUser.email,
       },
     });
   } catch (error) {
@@ -78,9 +77,7 @@ app.post('/login', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const user: any = await User.findOne({ 
-      $or: [{ email: login }, { username: login }] 
-    });
+    const user: any = await User.findOne({ username: login });
     
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -98,7 +95,6 @@ app.post('/login', async (req: Request, res: Response) => {
       user: {
         id: user._id,
         username: user.username,
-        email: user.email,
       },
     });
   } catch (error) {
@@ -110,7 +106,11 @@ app.post('/login', async (req: Request, res: Response) => {
 app.patch('/users/:id', authenticate, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { username, email, password } = req.body;
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ error: 'Password is required' });
+    }
 
     // Ensure user is updating their own profile
     if ((req as any).user._id.toString() !== id) {
@@ -122,27 +122,18 @@ app.patch('/users/:id', authenticate, async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    if (username) user.username = username;
-    if (email) user.email = email;
-    if (password) {
-      user.password = password; // The pre-save hook will hash this
-    }
-
+    user.password = password; // The pre-save hook will hash this
     await user.save();
 
     res.status(200).json({
-      message: 'User updated successfully',
+      message: 'Password updated successfully',
       user: {
         id: user._id,
         username: user.username,
-        email: user.email,
       },
     });
   } catch (error: any) {
-    if (error.code === 11000) {
-      return res.status(409).json({ error: 'Username or email already exists' });
-    }
-    res.status(500).json({ error: 'Failed to update user' });
+    res.status(500).json({ error: 'Failed to update password' });
   }
 });
 

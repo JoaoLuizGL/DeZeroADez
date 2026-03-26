@@ -75,7 +75,6 @@ export function AuthModal({ trigger }: AuthModalProps) {
 
     const formData = new FormData(e.currentTarget);
     const username = formData.get("username");
-    const email = formData.get("email");
     const password = formData.get("password");
 
     try {
@@ -84,7 +83,7 @@ export function AuthModal({ trigger }: AuthModalProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
@@ -132,11 +131,11 @@ export function AuthModal({ trigger }: AuthModalProps) {
           <TabsContent value="login">
             <form onSubmit={handleLogin} className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="login">Usuário ou E-mail</Label>
+                <Label htmlFor="login">Usuário</Label>
                 <Input
                   id="login"
                   name="login"
-                  placeholder="Digite seu usuário ou e-mail"
+                  placeholder="Digite seu usuário"
                   required
                 />
               </div>
@@ -164,16 +163,6 @@ export function AuthModal({ trigger }: AuthModalProps) {
                   id="username"
                   name="username"
                   placeholder="Escolha um usuário"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Digite seu e-mail"
                   required
                 />
               </div>
