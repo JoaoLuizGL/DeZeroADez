@@ -36,10 +36,10 @@ const ThemeCard = ({ theme, onClick, onEdit }: { theme: Theme; onClick: () => vo
       <div className="absolute top-3 right-3 z-20 flex gap-2">
         <Button 
           variant="secondary" 
-          size="icon" 
-          className="h-8 w-8 bg-black/50 border-none text-white hover:bg-primary hover:text-primary-foreground backdrop-blur-sm transition-all duration-300"
+          className="h-8 px-3 gap-2 bg-black/50 border-none text-white hover:bg-primary hover:text-primary-foreground backdrop-blur-sm transition-all duration-300"
           onClick={onEdit}
         >
+          <span className="text-xs font-medium">Editar</span>
           <Settings className="w-4 h-4" />
         </Button>
       </div>
