@@ -135,6 +135,14 @@ const ThemePage = () => {
     [placedItems, selectedItemId]
   );
 
+  const handleReset = useCallback(() => {
+    if (currentTheme) {
+      setAvailableItems(currentTheme.items);
+      setPlacedItems([]);
+      setSelectedItemId(null);
+    }
+  }, [currentTheme]);
+
   const isPlacedItemSelected = useMemo(() => {
     return placedItems.some((i) => i.id === selectedItemId);
   }, [placedItems, selectedItemId]);
@@ -183,6 +191,7 @@ const ThemePage = () => {
         onPlaceItem={handlePlaceItem}
         onRemoveItem={handleRemoveItem}
         onSelectItem={handleSelectItem}
+        onReset={handleReset}
       />
     </div>
   );

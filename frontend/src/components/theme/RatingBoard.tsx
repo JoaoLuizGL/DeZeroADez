@@ -1,5 +1,6 @@
 import { PlacedItem } from "@/types/theme";
 import NumberSlot from "./NumberSlot";
+import { Button } from "@/components/ui/button";
 
 interface RatingBoardProps {
   themeName: string;
@@ -10,6 +11,7 @@ interface RatingBoardProps {
   onPlaceItem: (rating: number, slotIndex: number) => void;
   onRemoveItem: (itemId: string) => void;
   onSelectItem: (id: string) => void;
+  onReset: () => void;
 }
 
 const RATING_CONFIG: { rating: number; slots: number }[] = [
@@ -35,6 +37,7 @@ const RatingBoard = ({
   onPlaceItem,
   onRemoveItem,
   onSelectItem,
+  onReset,
 }: RatingBoardProps) => {
   const hasSelectedItem = selectedItemId !== null;
   return (
@@ -94,6 +97,22 @@ const RatingBoard = ({
             );
           })}
         </div>
+      </div>
+
+      <div className="p-4 border-t border-border flex justify-end gap-3 bg-background/50 backdrop-blur-sm">
+        <Button 
+          variant="outline" 
+          onClick={onReset}
+          className="border-blue-500/50 text-blue-500 hover:bg-blue-500/10 hover:text-blue-600 transition-colors font-semibold uppercase tracking-wider text-xs px-6"
+        >
+          Reiniciar
+        </Button>
+        <Button 
+          className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold uppercase tracking-widest text-xs px-8 shadow-lg shadow-primary/20"
+          onClick={() => console.log("Concluir clicked")}
+        >
+          Concluir
+        </Button>
       </div>
     </div>
   );
