@@ -45,7 +45,7 @@ const RatingBoard = ({
       <div className="p-3 border-b border-border flex items-center justify-between">
         <div className="flex-1">
           <h2 className="font-display text-2xl text-primary tracking-wide whitespace-nowrap uppercase italic">
-            DE SOLA A DEZ
+            DE ZERO A DEZ
           </h2>
         </div>
         
